@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { 
   ShieldCheck, 
   MapPin, 
@@ -11,6 +11,7 @@ import {
   Layers
 } from 'lucide-react';
 import { exportRelocationBrief } from '../../services/exportService';
+import { getRankedRelocationSites, calculateDistanceKm } from '../../services/relocationEngine';
 import RelocationPlanModal from './RelocationPlanModal';
 
 export default function RelocationView({
@@ -25,7 +26,21 @@ export default function RelocationView({
   const [isPlanModalOpen, setIsPlanModalOpen] = useState(false);
 
   const activeHabitation = selectedHabitation || habitations[0] || null;
-  const activeSite = selectedRelocationSite || relocationSites[0] || null;
+
+  // Contextually rank all candidate sites for the active habitation
+  const rankedCandidates = useMemo(() => {
+    if (!activeHabitation) return [];
+    return getRankedRelocationSites(activeHabitation, relocationSites);
+  }, [activeHabitation, relocationSites]);
+
+  // Match the user's selected relocation site or fall back to the top ranked option
+  const activeSite = useMemo(() => {
+    if (selectedRelocationSite) {
+      const match = rankedCandidates.find(s => s.id === selectedRelocationSite.id);
+      if (match) return match;
+    }
+    return rankedCandidates[0] || null;
+  }, [selectedRelocationSite, rankedCandidates]);
 
   if (!activeHabitation) {
     return (
@@ -34,14 +49,6 @@ export default function RelocationView({
       </div>
     );
   }
-
-  const getDistance = (site) => {
-    if (site.id === 'site-periya' && activeHabitation.id === 'hab-mogral-puthur') return 8.4;
-    if (site.id === 'site-vidyanagar' && activeHabitation.id === 'hab-mogral-puthur') return 6.2;
-    if (site.id === 'site-kanhangad' && activeHabitation.id === 'hab-mogral-puthur') return 14.2;
-    if (site.id === 'site-nileshwar' && activeHabitation.id === 'hab-mogral-puthur') return 22.0;
-    return 9.5;
-  };
 
   const remainingCapacity = activeSite ? activeSite.capacity - activeHabitation.population : 0;
   const isCapacityAdequate = remainingCapacity >= 0;
@@ -65,10 +72,10 @@ export default function RelocationView({
             Decision Support & Safety Matching
           </div>
           <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">
-            Find Safer Locations for Relocation
+            Safer relocation options for {activeHabitation.name}
           </h1>
           <p className="text-sm text-slate-600 max-w-2xl mt-0.5">
-            Matching vulnerable settlements with resilient public sites based on elevation, capacity, road access, and healthcare proximity.
+            Evaluating safe public sites for {activeHabitation.population.toLocaleString()} exposed residents based on transit distance, capacity buffer, high-ground elevation, and healthcare proximity.
           </p>
         </div>
 
@@ -154,11 +161,11 @@ export default function RelocationView({
               {/* Numbers Grid */}
               <div className="grid grid-cols-3 gap-3 p-3.5 bg-slate-50 rounded-xl border border-slate-200 mb-5 text-center sm:text-left">
                 <div>
-                  <div className="text-[11px] text-slate-500 font-medium">Distance</div>
+                  <div className="text-[11px] text-slate-500 font-medium">Estimated Distance</div>
                   <div className="text-xl font-extrabold text-blue-700 mt-0.5">
-                    {getDistance(activeSite)} <span className="text-xs font-semibold text-slate-500">km</span>
+                    {activeSite.distanceKm} <span className="text-xs font-semibold text-slate-500">km</span>
                   </div>
-                  <div className="text-[10px] text-slate-400">~14 mins transit</div>
+                  <div className="text-[10px] text-slate-400">Direct transit corridor</div>
                 </div>
 
                 <div>
@@ -180,32 +187,18 @@ export default function RelocationView({
                 </div>
               </div>
 
-              {/* Why Recommended: 5 Simple Bullets */}
+              {/* Why Recommended: Contextual Bullets */}
               <div className="space-y-2 mb-5">
                 <div className="text-xs font-bold text-slate-900">
-                  Why Recommended:
+                  Why Recommended for {activeHabitation.name}:
                 </div>
-                <div className="space-y-1.5 text-xs text-slate-700 bg-slate-50/50 p-3 rounded-lg border border-slate-200">
-                  <div className="flex items-start space-x-2">
-                    <CheckCircle2 className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
-                    <span><strong>Lower hazard exposure:</strong> Elevated 72m above sea level, protected from coastal surge and river floods.</span>
-                  </div>
-                  <div className="flex items-start space-x-2">
-                    <CheckCircle2 className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
-                    <span><strong>Enough capacity:</strong> Can accommodate all 2,840 residents of Mogral Puthur with 25% surplus headroom.</span>
-                  </div>
-                  <div className="flex items-start space-x-2">
-                    <CheckCircle2 className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
-                    <span><strong>Good road access:</strong> Direct access via NH-66 bypass enables swift transit of passenger buses.</span>
-                  </div>
-                  <div className="flex items-start space-x-2">
-                    <CheckCircle2 className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
-                    <span><strong>Healthcare nearby:</strong> Periya Community Health Centre is located 1.4 km away for medical triage.</span>
-                  </div>
-                  <div className="flex items-start space-x-2">
-                    <CheckCircle2 className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
-                    <span><strong>Public ownership:</strong> Institutional government campus eliminates private land requisition hurdles.</span>
-                  </div>
+                <div className="space-y-2 text-xs text-slate-700 bg-slate-50/70 p-3.5 rounded-lg border border-slate-200">
+                  {activeSite.whyRecommended?.map((reason, idx) => (
+                    <div key={idx} className="flex items-start space-x-2.5">
+                      <CheckCircle2 className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                      <span className="leading-relaxed">{reason}</span>
+                    </div>
+                  ))}
                 </div>
               </div>
 
@@ -251,16 +244,15 @@ export default function RelocationView({
         <div className="lg:col-span-5 space-y-3">
           <div className="flex items-center justify-between pb-1">
             <h3 className="text-xs font-bold uppercase tracking-wider text-slate-700">
-              Candidate Safe Locations ({relocationSites.length})
+              Candidate Safe Locations ({rankedCandidates.length})
             </h3>
-            <span className="text-[11px] text-blue-700 font-semibold">Ranked by Suitability</span>
+            <span className="text-[11px] text-blue-700 font-semibold">Ranked for {activeHabitation.name}</span>
           </div>
 
           <div className="space-y-2.5">
-            {relocationSites.map((site, index) => {
+            {rankedCandidates.map((site, index) => {
               const isSelected = activeSite?.id === site.id;
-              const dist = getDistance(site);
-              const remaining = site.capacity - activeHabitation.population;
+              const isTop = index === 0;
 
               return (
                 <div
@@ -275,10 +267,12 @@ export default function RelocationView({
                   <div className="flex items-start justify-between">
                     <div>
                       <div className="flex items-center space-x-2">
-                        <span className="text-[10px] font-bold px-1.5 py-0.2 rounded bg-blue-50 text-blue-800 border border-blue-200">
-                          #{index + 1}
+                        <span className={`text-[10px] font-bold px-1.5 py-0.2 rounded border ${
+                          isTop ? 'bg-emerald-50 text-emerald-800 border-emerald-200' : 'bg-blue-50 text-blue-800 border-blue-200'
+                        }`}>
+                          #{index + 1} {isTop ? 'Top Match' : ''}
                         </span>
-                        <span className="text-xs text-slate-500">{dist} km away</span>
+                        <span className="text-xs text-slate-500">~{site.distanceKm} km estimated distance</span>
                       </div>
                       <h4 className="text-sm font-bold text-slate-900 mt-1">{site.name}</h4>
                       <p className="text-[11px] text-slate-500 mt-0.5">
@@ -302,8 +296,8 @@ export default function RelocationView({
                     </div>
                     <div className="text-right">
                       <span className="text-slate-500">Buffer: </span>
-                      <strong className={remaining >= 0 ? 'text-green-700' : 'text-red-700'}>
-                        {remaining >= 0 ? `+${remaining.toLocaleString()}` : remaining.toLocaleString()}
+                      <strong className={site.buffer >= 0 ? 'text-green-700' : 'text-red-700'}>
+                        {site.buffer >= 0 ? `+${site.buffer.toLocaleString()}` : site.buffer.toLocaleString()}
                       </strong>
                     </div>
                   </div>

@@ -31,7 +31,17 @@ export default function DataSourcesView() {
       color: 'text-orange-600',
       badgeBg: 'bg-orange-50 border-orange-200 text-orange-800',
       description: 'Used for meteorological warnings, cyclonic swell alerts, and district emergency bulletins broadcast directly to authorities.',
-      integrationMode: 'Ingested via CAP XML alert feed'
+      integrationMode: 'CAP XML alert specification reference'
+    },
+    {
+      id: 'osm',
+      name: 'OpenStreetMap (OSM)',
+      role: 'Base Geographic Mapping & Road Network Layer',
+      icon: Database,
+      color: 'text-emerald-600',
+      badgeBg: 'bg-emerald-50 border-emerald-200 text-emerald-800',
+      description: 'Provides live geographic context, road infrastructure (NH-66, arterial roads), administrative boundaries, and coastal geography without requiring proprietary API keys.',
+      integrationMode: 'Live TileLayer raster tile stream'
     }
   ];
 
@@ -51,39 +61,69 @@ export default function DataSourcesView() {
       </div>
 
       {/* Sources Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {sources.map((src) => {
           const Icon = src.icon;
           return (
             <div
               key={src.id}
-              className="bg-white border border-slate-200 rounded-xl p-5 shadow-xs space-y-3"
+              className="bg-white border border-slate-200 rounded-xl p-4 shadow-xs space-y-2.5 flex flex-col justify-between"
             >
-              <div className="flex items-center justify-between">
-                <div className="w-9 h-9 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-center">
-                  <Icon className={`w-4 h-4 ${src.color}`} />
+              <div className="space-y-2.5">
+                <div className="flex items-center justify-between">
+                  <div className="w-8 h-8 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-center">
+                    <Icon className={`w-4 h-4 ${src.color}`} />
+                  </div>
+                  <span className={`px-2 py-0.5 rounded text-[10px] font-bold border ${src.badgeBg}`}>
+                    Reference Source
+                  </span>
                 </div>
-                <span className={`px-2 py-0.5 rounded text-[10px] font-bold border ${src.badgeBg}`}>
-                  Official Source
-                </span>
+
+                <div>
+                  <h3 className="text-sm font-bold text-slate-900">{src.name}</h3>
+                  <p className="text-[11px] text-blue-700 font-medium mt-0.5">{src.role}</p>
+                </div>
+
+                <p className="text-xs text-slate-600 leading-relaxed">
+                  {src.description}
+                </p>
               </div>
 
-              <div>
-                <h3 className="text-sm font-bold text-slate-900">{src.name}</h3>
-                <p className="text-xs text-blue-700 font-medium mt-0.5">{src.role}</p>
-              </div>
-
-              <p className="text-xs text-slate-600 leading-relaxed">
-                {src.description}
-              </p>
-
-              <div className="pt-2.5 border-t border-slate-100 text-[11px] text-slate-500">
-                <strong className="text-slate-700 block mb-0.5">Integration:</strong>
+              <div className="pt-2 border-t border-slate-100 text-[11px] text-slate-500">
+                <strong className="text-slate-700 block mb-0.5">Integration Method:</strong>
                 {src.integrationMode}
               </div>
             </div>
           );
         })}
+      </div>
+
+      {/* Current Operational Data vs Planned Live APIs */}
+      <div className="bg-slate-50 border border-slate-200 rounded-xl p-5 shadow-xs space-y-3">
+        <h3 className="text-sm font-bold text-slate-900">
+          Data Governance: Current Implementation vs Planned Live Integrations
+        </h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+          <div className="bg-white p-4 rounded-lg border border-slate-200 space-y-1.5">
+            <div className="font-bold text-blue-800 flex items-center space-x-1.5">
+              <span className="w-2 h-2 rounded-full bg-blue-600"></span>
+              <span>Current Application Data (Pilot)</span>
+            </div>
+            <p className="text-slate-600 leading-relaxed">
+              Active decision models operate on verified geographic data for Kasaragod District, Kerala (Mogral Puthur, Kumbla North, Pallikkara, Cheruvathur). Coordinates, elevations, census demographics, and route distance matrices are stored locally to guarantee deterministic response times and offline resilience during emergency operations.
+            </p>
+          </div>
+
+          <div className="bg-white p-4 rounded-lg border border-slate-200 space-y-1.5">
+            <div className="font-bold text-emerald-800 flex items-center space-x-1.5">
+              <span className="w-2 h-2 rounded-full bg-emerald-600"></span>
+              <span>Live Geographic Mapping</span>
+            </div>
+            <p className="text-slate-600 leading-relaxed">
+              Base cartography is rendered via OpenStreetMap standard tiles using React-Leaflet. No third-party proprietary API keys (e.g. Google Maps or Mapbox) are required, preventing sudden service throttling or billable quotas during disaster surges.
+            </p>
+          </div>
+        </div>
       </div>
 
       {/* Architecture Flow */}

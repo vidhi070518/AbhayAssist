@@ -22,16 +22,41 @@ import {
 } from 'lucide-react';
 import { HAZARD_GEOJSON } from '../../data/hazardGeoJSON';
 import MapLegend from './MapLegend';
+import { getRankedRelocationSites, calculateDistanceKm } from '../../services/relocationEngine';
 
 // Geographic center for Kasaragod District, Kerala
 const KASARAGOD_CENTER = [12.5102, 75.0000];
 const DEFAULT_ZOOM = 11;
+
+// Ensures Leaflet recalculates dimensions when container mounts or resizes
+function MapSizeInvalidator() {
+  const map = useMap();
+  useEffect(() => {
+    map.invalidateSize();
+    const timer = setTimeout(() => {
+      map.invalidateSize();
+    }, 250);
+    const resizeObserver = new ResizeObserver(() => {
+      map.invalidateSize();
+    });
+    const container = map.getContainer();
+    if (container) {
+      resizeObserver.observe(container);
+    }
+    return () => {
+      clearTimeout(timer);
+      resizeObserver.disconnect();
+    };
+  }, [map]);
+  return null;
+}
 
 // Programmatic map movement controller
 function MapFlyController({ targetCoords, zoomLevel }) {
   const map = useMap();
   useEffect(() => {
     if (targetCoords && targetCoords[0] && targetCoords[1]) {
+      map.invalidateSize();
       map.flyTo(targetCoords, zoomLevel || 13, {
         duration: 1.2,
         easeLinearity: 0.25
@@ -179,21 +204,45 @@ export default function InteractiveMap({
     });
   };
 
-  // Safe Relocation Site Marker (Blue Shelter Shield Pin)
+  // Contextual candidate ranking for selected habitation
+  const rankedCandidates = useMemo(() => {
+    if (!selectedHabitation) return [];
+    return getRankedRelocationSites(selectedHabitation, relocationSites);
+  }, [selectedHabitation, relocationSites]);
+
+  const topRecommendedSite = rankedCandidates[0] || null;
+  const activeTargetSite = selectedRelocationSite || topRecommendedSite;
+
+  const candidateMap = useMemo(() => {
+    const map = new Map();
+    rankedCandidates.forEach(rc => {
+      map.set(rc.id, rc);
+    });
+    return map;
+  }, [rankedCandidates]);
+
+  // Safe Relocation Site Marker (Distinguishes Top-Recommended from Candidate Sites)
   const createRelocationIcon = (site) => {
-    const isSelected = selectedRelocationSite?.id === site.id;
+    const isSelected = activeTargetSite?.id === site.id;
+    const isTopRecommended = topRecommendedSite?.id === site.id;
+
+    const bgColor = isTopRecommended ? '#059669' : '#2563eb';
+    const shadowColor = isTopRecommended ? 'rgba(5,150,105,0.45)' : 'rgba(37,99,235,0.4)';
+    const labelText = isTopRecommended ? 'Top Safe Option' : 'Safe Site';
+    const labelBg = isTopRecommended ? '#065f46' : '#1e3a8a';
+
     return L.divIcon({
       className: 'custom-map-pin',
       html: `
         <div class="relative flex flex-col items-center">
           <div class="${isSelected ? 'selected' : ''}" style="
-            background: #2563eb;
+            background: ${bgColor};
             color: #ffffff;
             width: 30px;
             height: 30px;
             border-radius: 6px;
             border: 2px solid #ffffff;
-            box-shadow: 0 2px 6px rgba(37,99,235,0.4);
+            box-shadow: 0 2px 6px ${shadowColor};
             display: flex;
             align-items: center;
             justify-content: center;
@@ -205,16 +254,16 @@ export default function InteractiveMap({
           </div>
           <div style="
             margin-top: 3px;
-            background: #1e3a8a;
+            background: ${labelBg};
             color: #ffffff;
             font-size: 9px;
-            font-weight: 600;
+            font-weight: 700;
             padding: 1px 5px;
             border-radius: 3px;
             white-space: nowrap;
             box-shadow: 0 1px 3px rgba(0,0,0,0.15);
           ">
-            Safe Site
+            ${labelText}
           </div>
         </div>
       `,
@@ -253,18 +302,23 @@ export default function InteractiveMap({
     });
   };
 
-  // Evacuation route coordinates
+  // Dynamic Evacuation Route Coordinates & Distance
   const evacuationRouteCoords = useMemo(() => {
-    if (!selectedHabitation || !selectedRelocationSite) return null;
+    if (!selectedHabitation || !activeTargetSite) return null;
     return [
       selectedHabitation.coordinates,
       [
-        (selectedHabitation.coordinates[0] + selectedRelocationSite.coordinates[0]) / 2 + 0.005,
-        (selectedHabitation.coordinates[1] + selectedRelocationSite.coordinates[1]) / 2 + 0.012
+        (selectedHabitation.coordinates[0] + activeTargetSite.coordinates[0]) / 2 + 0.005,
+        (selectedHabitation.coordinates[1] + activeTargetSite.coordinates[1]) / 2 + 0.012
       ],
-      selectedRelocationSite.coordinates
+      activeTargetSite.coordinates
     ];
-  }, [selectedHabitation, selectedRelocationSite]);
+  }, [selectedHabitation, activeTargetSite]);
+
+  const routeDistanceKm = useMemo(() => {
+    if (!selectedHabitation || !activeTargetSite) return 0;
+    return calculateDistanceKm(selectedHabitation.coordinates, activeTargetSite.coordinates);
+  }, [selectedHabitation, activeTargetSite]);
 
   return (
     <div className="relative w-full h-full min-h-[500px] flex flex-col bg-slate-100 overflow-hidden">
@@ -444,7 +498,9 @@ export default function InteractiveMap({
         zoom={DEFAULT_ZOOM}
         scrollWheelZoom={true}
         className="w-full h-full"
+        style={{ width: '100%', height: '100%' }}
       >
+        <MapSizeInvalidator />
         <MapFlyController targetCoords={mapCenter} zoomLevel={mapZoom} />
 
         {/* Real OpenStreetMap Basemap Tiles */}
@@ -477,23 +533,26 @@ export default function InteractiveMap({
           />
         )}
 
-        {/* Evacuation Route Line */}
+        {/* Dynamic Evacuation Route Line */}
         {visibleLayers.corridor && evacuationRouteCoords && (
           <Polyline
             positions={evacuationRouteCoords}
             pathOptions={{
-              color: '#2563eb',
+              color: '#059669',
               weight: 3.5,
               dashArray: '6, 6',
-              opacity: 0.8
+              opacity: 0.85
             }}
           >
             <Popup>
               <div className="text-xs p-1">
-                <div className="font-bold text-blue-700 mb-0.5">Evacuation Transit Corridor</div>
-                <div><strong>From:</strong> {selectedHabitation?.name}</div>
-                <div><strong>To:</strong> {selectedRelocationSite?.name}</div>
-                <div className="text-[10px] text-slate-500 mt-1">Route via NH-66 Corridor</div>
+                <div className="font-bold text-emerald-800 mb-0.5">Evacuation Transit Corridor</div>
+                <div><strong>Origin:</strong> {selectedHabitation?.name} (Risk: {selectedHabitation?.riskScore})</div>
+                <div><strong>Destination:</strong> {activeTargetSite?.name}</div>
+                <div className="text-slate-800 font-semibold mt-1">
+                  Estimated Distance: <span className="text-emerald-700">{routeDistanceKm} km</span>
+                </div>
+                <div className="text-[10px] text-slate-500 mt-0.5">Route: NH-66 Arterial Highway Corridor</div>
               </div>
             </Popup>
           </Polyline>
@@ -527,34 +586,48 @@ export default function InteractiveMap({
         })}
 
         {/* Candidate Safe Relocation Site Markers */}
-        {visibleLayers.relocationSites && relocationSites.map(site => (
-          <Marker
-            key={site.id}
-            position={site.coordinates}
-            icon={createRelocationIcon(site)}
-            eventHandlers={{
-              click: () => onSelectRelocationSite(site)
-            }}
-          >
-            <Popup>
-              <div className="text-xs">
-                <div className="font-bold text-blue-700 text-sm mb-0.5">{site.name}</div>
-                <div className="text-slate-600 text-[11px] mb-1">
-                  Capacity: <strong>{site.capacity.toLocaleString()}</strong> people • Elevation: <strong>{site.elevationMeters}m</strong>
+        {visibleLayers.relocationSites && relocationSites.map(site => {
+          const evaluated = candidateMap.get(site.id) || site;
+          const isTop = topRecommendedSite?.id === site.id;
+          const dist = evaluated.distanceKm || calculateDistanceKm(selectedHabitation?.coordinates, site.coordinates);
+
+          return (
+            <Marker
+              key={site.id}
+              position={site.coordinates}
+              icon={createRelocationIcon(site)}
+              eventHandlers={{
+                click: () => onSelectRelocationSite(evaluated)
+              }}
+            >
+              <Popup>
+                <div className="text-xs">
+                  {isTop && (
+                    <span className="inline-block px-1.5 py-0.2 bg-emerald-100 text-emerald-800 font-bold rounded text-[10px] mb-1">
+                      ★ Top Safe Option for {selectedHabitation?.name || 'Area'}
+                    </span>
+                  )}
+                  <div className="font-bold text-blue-700 text-sm mb-0.5">{site.name}</div>
+                  <div className="text-slate-600 text-[11px] mb-1">
+                    Capacity: <strong>{site.capacity.toLocaleString()}</strong> people • Elevation: <strong>{site.elevationMeters}m</strong>
+                  </div>
+                  <div className="text-slate-600 text-[11px] mb-1">
+                    Estimated distance: <strong>{dist} km</strong>
+                  </div>
+                  <div className="text-slate-600 text-[11px] mb-2">
+                    Suitability for {selectedHabitation?.name || 'Habitation'}: <strong className="text-emerald-700">{evaluated.suitabilityScore || site.suitabilityScore}/100</strong>
+                  </div>
+                  <button
+                    onClick={() => onSelectRelocationSite(evaluated)}
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-1 px-2 rounded text-[11px] transition text-center"
+                  >
+                    Select This Safe Location
+                  </button>
                 </div>
-                <div className="text-slate-600 text-[11px] mb-2">
-                  Suitability: <strong className="text-blue-700">{site.suitabilityScore}/100</strong>
-                </div>
-                <button
-                  onClick={() => onSelectRelocationSite(site)}
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-1 px-2 rounded text-[11px] transition text-center"
-                >
-                  Select This Location
-                </button>
-              </div>
-            </Popup>
-          </Marker>
-        ))}
+              </Popup>
+            </Marker>
+          );
+        })}
 
         {/* Habitation Markers */}
         {visibleLayers.habitations && filteredHabitations.map(h => (
@@ -607,6 +680,24 @@ export default function InteractiveMap({
           </Marker>
         ))}
       </MapContainer>
+
+      {/* Dynamic Transit Corridor Status Badge */}
+      {selectedHabitation && activeTargetSite && (
+        <div className="absolute bottom-5 left-3 z-[1000] bg-white/95 backdrop-blur-xs border border-slate-300 rounded-lg shadow-md px-3.5 py-2 text-xs flex items-center space-x-2.5 max-w-sm sm:max-w-md">
+          <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse flex-shrink-0"></div>
+          <div>
+            <div className="font-bold text-slate-900 flex items-center space-x-1.5 flex-wrap">
+              <span>Evacuation Corridor:</span>
+              <span className="text-blue-700">{selectedHabitation.name}</span>
+              <span className="text-slate-400">→</span>
+              <span className="text-emerald-700">{activeTargetSite.name}</span>
+            </div>
+            <div className="text-[11px] text-slate-500 mt-0.5">
+              Estimated Transit Distance: <strong className="text-slate-800">{routeDistanceKm} km</strong> • Suitability: <strong className="text-emerald-700">{(candidateMap.get(activeTargetSite.id) || activeTargetSite).suitabilityScore || activeTargetSite.suitabilityScore}/100</strong>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Map Legend */}
       <MapLegend />

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { 
   ShieldCheck, 
   Map as MapIcon, 
@@ -10,13 +10,15 @@ import {
   Bell, 
   ArrowRight, 
   MapPin, 
-  Building,
+  Building, 
   Radio
 } from 'lucide-react';
+import { getRankedRelocationSites } from '../../services/relocationEngine';
 
 export default function OverviewView({
   habitations = [],
   relocationSites = [],
+  selectedHabitation,
   onSelectHabitation,
   onOpenMap,
   onOpenRelocation,
@@ -26,7 +28,14 @@ export default function OverviewView({
   const highRiskHabitations = habitations.filter(h => h.riskScore >= 70);
   const totalPeopleAtRisk = habitations.reduce((sum, h) => sum + (h.population || 0), 0);
   const totalSafeCapacity = relocationSites.reduce((sum, s) => sum + (s.capacity || 0), 0);
-  const topRelocationSite = relocationSites[0];
+
+  const activeHabitation = selectedHabitation || habitations[0] || null;
+  const rankedSites = useMemo(() => {
+    if (!activeHabitation) return [];
+    return getRankedRelocationSites(activeHabitation, relocationSites);
+  }, [activeHabitation, relocationSites]);
+
+  const topRelocationSite = rankedSites[0] || relocationSites[0];
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-8">
@@ -218,10 +227,15 @@ export default function OverviewView({
           {topRelocationSite && (
             <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-xs space-y-3">
               <div className="flex items-center justify-between pb-2 border-b border-slate-100">
-                <h2 className="text-sm font-bold text-slate-900">
-                  Recommended Relocation
-                </h2>
-                <span className="text-xs font-bold text-blue-700">
+                <div>
+                  <h2 className="text-sm font-bold text-slate-900">
+                    Recommended Relocation
+                  </h2>
+                  <div className="text-[11px] text-slate-500">
+                    For high-risk settlement: <strong className="text-slate-800">{activeHabitation?.name}</strong>
+                  </div>
+                </div>
+                <span className="text-xs font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded border border-blue-200">
                   {topRelocationSite.suitabilityScore}/100 Suitability
                 </span>
               </div>
@@ -229,39 +243,32 @@ export default function OverviewView({
               <div>
                 <h3 className="text-base font-bold text-slate-900">{topRelocationSite.name}</h3>
                 <div className="text-xs text-slate-500 mt-0.5">
-                  Capacity: <strong className="text-slate-800">{topRelocationSite.capacity.toLocaleString()} people</strong> • Distance: <strong className="text-slate-800">8.4 km</strong>
+                  Capacity: <strong className="text-slate-800">{topRelocationSite.capacity.toLocaleString()} people</strong> • Distance: <strong className="text-slate-800">~{topRelocationSite.distanceKm || 8.4} km</strong>
                 </div>
               </div>
 
               <div className="space-y-1.5 text-xs text-slate-600 bg-slate-50 p-3 rounded-lg border border-slate-200">
-                <div className="font-semibold text-slate-800 mb-1 text-[11px]">Why recommended:</div>
-                <div className="flex items-start space-x-1.5">
-                  <span className="text-blue-600 font-bold">•</span>
-                  <span>Lower hazard exposure (elevated 72m above sea level)</span>
-                </div>
-                <div className="flex items-start space-x-1.5">
-                  <span className="text-blue-600 font-bold">•</span>
-                  <span>Sufficient capacity for Mogral Puthur (2,840 people)</span>
-                </div>
-                <div className="flex items-start space-x-1.5">
-                  <span className="text-blue-600 font-bold">•</span>
-                  <span>Direct highway access via NH-66 bypass</span>
-                </div>
-                <div className="flex items-start space-x-1.5">
-                  <span className="text-blue-600 font-bold">•</span>
-                  <span>Healthcare facility nearby (Periya CHC within 1.4 km)</span>
-                </div>
+                <div className="font-semibold text-slate-800 mb-1 text-[11px]">Why recommended for {activeHabitation?.name}:</div>
+                {(topRelocationSite.whyRecommended || [
+                  `Elevated safe ground (${topRelocationSite.elevationMeters}m MSL), outside flood inundation zones.`,
+                  `Sufficient institutional capacity for ${activeHabitation?.population?.toLocaleString() || 'all'} residents.`,
+                  `Transit accessibility via ${topRelocationSite.roadAccessLevel.split('(')[0]}.`
+                ]).slice(0, 4).map((reason, idx) => (
+                  <div key={idx} className="flex items-start space-x-1.5">
+                    <span className="text-blue-600 font-bold">•</span>
+                    <span>{reason}</span>
+                  </div>
+                ))}
               </div>
 
               <button
                 onClick={() => {
-                  const mogral = habitations[0];
-                  if (mogral) onSelectHabitation(mogral);
+                  if (activeHabitation) onSelectHabitation(activeHabitation);
                   onOpenRelocation();
                 }}
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-3 rounded-lg text-xs transition text-center"
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-3 rounded-lg text-xs transition text-center shadow-xs"
               >
-                View Relocation Plan
+                View Relocation Plan for {activeHabitation?.name}
               </button>
             </div>
           )}

@@ -1,3 +1,5 @@
+import { calculateDistanceKm } from './relocationEngine';
+
 /**
  * Relocation Action Brief Export Service
  * Generates an executive decision-support brief for Disaster Management Authorities.
@@ -18,7 +20,11 @@ export function exportRelocationBrief({ habitation, relocationSite, assessmentDa
     minute: '2-digit'
   });
 
+  const distanceKm = relocationSite.distanceKm || calculateDistanceKm(habitation?.coordinates, relocationSite?.coordinates);
   const remainingCapacity = relocationSite.capacity - habitation.population;
+  const busesNeeded = Math.ceil(habitation.population / 45);
+  const whyRecommendedList = relocationSite.whyRecommended || [];
+  const nearestHosp = relocationSite.nearestHospital || 'District Emergency Hospital';
 
   const html = `
     <!DOCTYPE html>
@@ -185,7 +191,7 @@ export function exportRelocationBrief({ habitation, relocationSite, assessmentDa
         <div class="card">
           <div class="metric-label">Recommended Safe Location</div>
           <div style="font-size: 17px; font-weight: 700; margin-top: 4px; color: #1d4ed8;">${relocationSite.name}</div>
-          <div style="font-size: 12px; color: #64748b;">Elevation: ${relocationSite.elevationMeters}m MSL | Access: ${relocationSite.roadAccessLevel}</div>
+          <div style="font-size: 12px; color: #64748b;">Estimated Transit: ~${distanceKm} km | Elevation: ${relocationSite.elevationMeters}m MSL | Access: ${relocationSite.roadAccessLevel.split('(')[0]}</div>
           <div style="display: flex; gap: 20px; margin-top: 12px;">
             <div>
               <div class="metric-val" style="color: #1d4ed8;">${relocationSite.suitabilityScore}/100</div>
@@ -196,7 +202,7 @@ export function exportRelocationBrief({ habitation, relocationSite, assessmentDa
               <div class="metric-label">Capacity</div>
             </div>
             <div>
-              <div class="metric-val" style="color: #16a34a;">+${remainingCapacity.toLocaleString()}</div>
+              <div class="metric-val" style="color: ${remainingCapacity >= 0 ? '#16a34a' : '#dc2626'};">${remainingCapacity >= 0 ? '+' + remainingCapacity.toLocaleString() : remainingCapacity.toLocaleString()}</div>
               <div class="metric-label">Buffer</div>
             </div>
           </div>
@@ -209,26 +215,26 @@ export function exportRelocationBrief({ habitation, relocationSite, assessmentDa
 
       <div class="section-title">Why this Area is at Risk</div>
       <ul>
-        ${habitation.whyAtRisk.map(item => `<li>${item}</li>`).join('')}
+        ${(habitation.whyAtRisk || []).map(item => `<li>${item}</li>`).join('')}
       </ul>
 
-      <div class="section-title">Why ${relocationSite.name} is Recommended</div>
+      <div class="section-title">Why ${relocationSite.name} is Recommended for ${habitation.name}</div>
       <ul>
-        ${relocationSite.whyRecommended.map(item => `<li>${item}</li>`).join('')}
+        ${whyRecommendedList.map(item => `<li>${item}</li>`).join('')}
       </ul>
 
       <div class="section-title">Critical Facilities at Site</div>
       <ul>
-        ${relocationSite.infrastructure.map(item => `<li>${item}</li>`).join('')}
+        ${(relocationSite.infrastructure || []).map(item => `<li>${item}</li>`).join('')}
       </ul>
 
       <div class="section-title">Field Verification & Dispatch Checklist</div>
       <div>
-        <div class="checklist-item"><span class="check-box"></span> Confirm NH-66 transit corridor passability with traffic control.</div>
-        <div class="checklist-item"><span class="check-box"></span> Pre-alert ${relocationSite.nearestHospital} to stage mobile medical team.</div>
-        <div class="checklist-item"><span class="check-box"></span> Mobilize 40 KSRTC buses for prioritized community transit.</div>
-        <div class="checklist-item"><span class="check-box"></span> Verify backup generator and drinking water reserves at campus.</div>
-        <div class="checklist-item"><span class="check-box"></span> Dispatch local team for household-level verification.</div>
+        <div class="checklist-item"><span class="check-box"></span> Confirm ${relocationSite.roadAccessLevel.split('(')[0]} transit corridor clearance with Kasaragod Traffic Police.</div>
+        <div class="checklist-item"><span class="check-box"></span> Pre-alert ${nearestHosp} emergency reception & triage teams.</div>
+        <div class="checklist-item"><span class="check-box"></span> Mobilize ${busesNeeded} KSRTC buses from district depots for ${habitation.population.toLocaleString()} residents.</div>
+        <div class="checklist-item"><span class="check-box"></span> Verify backup generator fuel reserves and drinking water tanks at ${relocationSite.name}.</div>
+        <div class="checklist-item"><span class="check-box"></span> Dispatch Aapda Mitra / local team for household-level verification in ${habitation.name}.</div>
       </div>
 
       <div class="footer-note">

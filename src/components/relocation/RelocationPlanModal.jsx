@@ -8,6 +8,7 @@ import {
   ArrowRight,
   ClipboardList
 } from 'lucide-react';
+import { calculateDistanceKm } from '../../services/relocationEngine';
 
 export default function RelocationPlanModal({
   habitation,
@@ -27,8 +28,12 @@ export default function RelocationPlanModal({
     setChecklist(prev => ({ ...prev, [key]: !prev[key] }));
   };
 
+  const distanceKm = relocationSite.distanceKm || calculateDistanceKm(habitation?.coordinates, relocationSite?.coordinates);
   const remaining = relocationSite.capacity - habitation.population;
   const busesNeeded = Math.ceil(habitation.population / 45);
+  const ambulancesNeeded = Math.max(2, Math.ceil(habitation.population * 0.003));
+  const bufferPercent = Math.round((remaining / habitation.population) * 100);
+  const nearestHosp = relocationSite.nearestHospital || 'District Hospital';
 
   return (
     <div className="fixed inset-0 z-[2000] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs overflow-y-auto">
@@ -40,8 +45,8 @@ export default function RelocationPlanModal({
               <ClipboardList className="w-4 h-4" />
             </div>
             <div>
-              <h3 className="text-base font-bold text-slate-900">Relocation Action Plan</h3>
-              <p className="text-[11px] text-slate-500">Planned Evacuation & Transit Checklist</p>
+              <h3 className="text-base font-bold text-slate-900">Relocation Action Plan: {habitation.name}</h3>
+              <p className="text-[11px] text-slate-500">Planned Evacuation & Transit Protocol to {relocationSite.name}</p>
             </div>
           </div>
           <button
@@ -60,18 +65,18 @@ export default function RelocationPlanModal({
               <div className="text-[10px] text-slate-500 font-semibold uppercase">Origin (High Risk)</div>
               <div className="text-base font-bold text-slate-900">{habitation.name}</div>
               <div className="text-red-700 font-semibold text-[11px]">
-                Risk {habitation.riskScore}/100 • {habitation.population.toLocaleString()} people
+                Risk {habitation.riskScore}/100 • {habitation.population.toLocaleString()} residents
               </div>
             </div>
 
             <div className="flex flex-col items-center px-2">
-              <span className="text-[10px] font-bold text-blue-700">8.4 km Corridor</span>
+              <span className="text-[10px] font-bold text-blue-700">~{distanceKm} km Transit</span>
               <div className="flex items-center space-x-1.5 text-blue-600 my-0.5">
                 <div className="h-[2px] w-8 bg-blue-300"></div>
                 <ArrowRight className="w-4 h-4" />
                 <div className="h-[2px] w-8 bg-blue-300"></div>
               </div>
-              <span className="text-[9px] text-slate-400">NH-66 Arterial Road</span>
+              <span className="text-[9px] text-slate-400">{relocationSite.roadAccessLevel.split('(')[0]}</span>
             </div>
 
             <div className="text-center sm:text-right">
@@ -97,18 +102,20 @@ export default function RelocationPlanModal({
               </div>
               <div className="bg-slate-50 p-2.5 rounded-lg border border-slate-200">
                 <div className="text-[10px] text-slate-500">Ambulances</div>
-                <div className="text-base font-bold text-slate-900 mt-0.5">8 Ambulances</div>
+                <div className="text-base font-bold text-slate-900 mt-0.5">{ambulancesNeeded} Units</div>
                 <div className="text-[9px] text-slate-400">For vulnerable/elderly</div>
               </div>
               <div className="bg-slate-50 p-2.5 rounded-lg border border-slate-200">
                 <div className="text-[10px] text-slate-500">Buffer Headroom</div>
-                <div className="text-base font-bold text-green-700 mt-0.5">+{remaining} Capacity</div>
-                <div className="text-[9px] text-slate-400">25% margin</div>
+                <div className={`text-base font-bold mt-0.5 ${remaining >= 0 ? 'text-green-700' : 'text-red-700'}`}>
+                  {remaining >= 0 ? `+${remaining.toLocaleString()}` : remaining.toLocaleString()}
+                </div>
+                <div className="text-[9px] text-slate-400">{bufferPercent >= 0 ? `+${bufferPercent}% headroom` : 'Deficit'}</div>
               </div>
               <div className="bg-slate-50 p-2.5 rounded-lg border border-slate-200">
                 <div className="text-[10px] text-slate-500">Medical Facility</div>
-                <div className="text-base font-bold text-blue-700 mt-0.5">Periya CHC</div>
-                <div className="text-[9px] text-slate-400">1.4 km from site</div>
+                <div className="text-base font-bold text-blue-700 mt-0.5 truncate" title={nearestHosp}>{nearestHosp}</div>
+                <div className="text-[9px] text-slate-400">Designated triage centre</div>
               </div>
             </div>
           </div>
@@ -130,7 +137,7 @@ export default function RelocationPlanModal({
                   <Square className="w-4 h-4 text-slate-400 flex-shrink-0" />
                 )}
                 <span className={checklist.routeCleared ? 'line-through text-slate-400' : 'text-slate-700'}>
-                  Confirm NH-66 transit corridor clearance with Kasaragod Traffic Police.
+                  Confirm transit corridor clearance via {relocationSite.roadAccessLevel.split('(')[0]} with Traffic Police.
                 </span>
               </label>
 
@@ -144,7 +151,7 @@ export default function RelocationPlanModal({
                   <Square className="w-4 h-4 text-slate-400 flex-shrink-0" />
                 )}
                 <span className={checklist.transportNotified ? 'line-through text-slate-400' : 'text-slate-700'}>
-                  Issue mobilization requisition order for 40 KSRTC buses from depot.
+                  Issue mobilization requisition order for {busesNeeded} KSRTC buses from Kasaragod/Kanhangad depots.
                 </span>
               </label>
 
@@ -158,7 +165,7 @@ export default function RelocationPlanModal({
                   <Square className="w-4 h-4 text-slate-400 flex-shrink-0" />
                 )}
                 <span className={checklist.hospitalAlerted ? 'line-through text-slate-400' : 'text-slate-700'}>
-                  Alert Periya CHC and Kasaragod General Hospital triage teams.
+                  Alert {nearestHosp} emergency triage team for resident reception.
                 </span>
               </label>
 
@@ -172,7 +179,7 @@ export default function RelocationPlanModal({
                   <Square className="w-4 h-4 text-slate-400 flex-shrink-0" />
                 )}
                 <span className={checklist.powerWaterChecked ? 'line-through text-slate-400' : 'text-slate-700'}>
-                  Verify functional generator fuel levels and water tank capacity at campus.
+                  Verify functional generator fuel reserves and clean drinking water tanks at {relocationSite.name}.
                 </span>
               </label>
 
@@ -186,7 +193,7 @@ export default function RelocationPlanModal({
                   <Square className="w-4 h-4 text-slate-400 flex-shrink-0" />
                 )}
                 <span className={checklist.volunteersBriefed ? 'line-through text-slate-400' : 'text-slate-700'}>
-                  Deploy Civil Defence volunteers to Mogral Puthur coastal wards.
+                  Deploy Aapda Mitra / Civil Defence volunteers to {habitation.name} residential sectors.
                 </span>
               </label>
             </div>

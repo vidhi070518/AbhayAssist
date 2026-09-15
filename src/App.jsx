@@ -14,6 +14,7 @@ import DataSourcesView from './components/common/DataSourcesView';
 import { HABITATIONS_DATA } from './data/habitationsData';
 import { RELOCATION_SITES_DATA } from './data/relocationSitesData';
 import { INFRASTRUCTURE_DATA } from './data/infrastructureData';
+import { getRankedRelocationSites } from './services/relocationEngine';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('overview');
@@ -23,15 +24,19 @@ export default function App() {
   const [relocationSites] = useState(RELOCATION_SITES_DATA);
   const [infrastructure] = useState(INFRASTRUCTURE_DATA);
 
-  // Selected State (Defaulted to Mogral Puthur and Periya Community Campus)
+  // Selected State (Defaulted to Mogral Puthur and its top evaluated safe site)
   const [selectedHabitation, setSelectedHabitation] = useState(HABITATIONS_DATA[0]);
-  const [selectedRelocationSite, setSelectedRelocationSite] = useState(RELOCATION_SITES_DATA[0]);
+  const initialRanked = getRankedRelocationSites(HABITATIONS_DATA[0], RELOCATION_SITES_DATA);
+  const [selectedRelocationSite, setSelectedRelocationSite] = useState(initialRanked[0] || RELOCATION_SITES_DATA[0]);
   const [isRelocationMode, setIsRelocationMode] = useState(false);
 
   const handleSelectHabitation = (habitation) => {
     setSelectedHabitation(habitation);
-    const matchingSite = relocationSites.find(s => s.id === habitation.recommendedRelocationSiteId) || relocationSites[0];
-    setSelectedRelocationSite(matchingSite);
+    // Dynamically calculate and select the top candidate safe site for THIS habitation
+    const ranked = getRankedRelocationSites(habitation, relocationSites);
+    if (ranked.length > 0) {
+      setSelectedRelocationSite(ranked[0]);
+    }
   };
 
   const handleSelectRelocationSite = (site) => {
@@ -88,6 +93,7 @@ export default function App() {
             <OverviewView
               habitations={habitations}
               relocationSites={relocationSites}
+              selectedHabitation={selectedHabitation}
               onSelectHabitation={handleSelectHabitation}
               onOpenMap={() => setActiveTab('map')}
               onOpenRelocation={() => setActiveTab('relocation')}
