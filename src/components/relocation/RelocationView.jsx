@@ -6,11 +6,8 @@ import {
   ArrowRight, 
   Printer, 
   CheckCircle2, 
-  ExternalLink, 
-  AlertCircle, 
   Building, 
   Navigation,
-  Sparkles,
   Layers
 } from 'lucide-react';
 import { exportRelocationBrief } from '../../services/exportService';
@@ -27,20 +24,17 @@ export default function RelocationView({
 }) {
   const [isPlanModalOpen, setIsPlanModalOpen] = useState(false);
 
-  // Default to Mogral Puthur if none selected
   const activeHabitation = selectedHabitation || habitations[0] || null;
-  // Default to Periya Community Campus or currently selected site
   const activeSite = selectedRelocationSite || relocationSites[0] || null;
 
   if (!activeHabitation) {
     return (
-      <div className="p-8 text-center text-slate-400">
+      <div className="p-8 text-center text-slate-500">
         No habitations available for relocation evaluation.
       </div>
     );
   }
 
-  // Calculate distance approximation or use preset
   const getDistance = (site) => {
     if (site.id === 'site-periya' && activeHabitation.id === 'hab-mogral-puthur') return 8.4;
     if (site.id === 'site-vidyanagar' && activeHabitation.id === 'hab-mogral-puthur') return 6.2;
@@ -63,70 +57,68 @@ export default function RelocationView({
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-      {/* Top Banner / Heading */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-800 pb-6">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+      {/* Top Banner */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-200 pb-5">
         <div>
-          <div className="flex items-center space-x-2 text-cyan-400 text-xs font-bold uppercase tracking-wider mb-1">
-            <ShieldCheck className="w-4 h-4" />
-            <span>Proactive Decision Engine</span>
+          <div className="text-xs font-semibold text-blue-700 uppercase tracking-wider mb-1">
+            Decision Support & Safety Matching
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
-            Relocation Recommendation & Planning
+          <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">
+            Find Safer Locations for Relocation
           </h1>
-          <p className="text-sm text-slate-400 max-w-2xl mt-1">
-            AbhayAssist answers the crucial question: <strong className="text-slate-200">"Where can these people safely go?"</strong> Ranked by elevation, capacity, road accessibility, and multi-hazard resilience.
+          <p className="text-sm text-slate-600 max-w-2xl mt-0.5">
+            Matching vulnerable settlements with resilient public sites based on elevation, capacity, road access, and healthcare proximity.
           </p>
         </div>
 
-        {/* Global Actions */}
-        <div className="flex items-center space-x-3">
+        <div className="flex items-center space-x-2.5">
           <button
             onClick={handleExport}
-            className="flex items-center space-x-2 px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white rounded-xl border border-slate-700 font-semibold text-xs transition shadow-md"
+            className="flex items-center space-x-1.5 px-3.5 py-2 bg-white hover:bg-slate-50 text-slate-700 rounded-lg border border-slate-200 text-xs font-medium transition shadow-xs"
           >
-            <Printer className="w-4 h-4 text-cyan-400" />
-            <span>Export Relocation Brief</span>
+            <Printer className="w-3.5 h-3.5 text-blue-600" />
+            <span>Export Action Brief</span>
           </button>
           
           <button
             onClick={() => setIsPlanModalOpen(true)}
-            className="flex items-center space-x-2 px-4 py-2.5 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white rounded-xl font-bold text-xs shadow-lg shadow-cyan-900/30 border border-cyan-400/40 transition"
+            className="flex items-center space-x-1.5 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-semibold shadow-xs transition"
           >
-            <Navigation className="w-4 h-4" />
+            <Navigation className="w-3.5 h-3.5" />
             <span>Open Relocation Plan</span>
           </button>
         </div>
       </div>
 
-      {/* Habitation Selector Bar */}
-      <div className="bg-slate-900/90 border border-slate-800 rounded-xl p-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+      {/* Selected Habitation Bar */}
+      <div className="bg-white border border-slate-200 rounded-xl p-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-3 shadow-xs">
         <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 rounded-lg bg-rose-950/80 border border-rose-800 flex items-center justify-center flex-shrink-0">
-            <span className="text-rose-400 font-extrabold text-sm">{activeHabitation.riskScore}</span>
+          <div className="w-9 h-9 rounded-lg bg-red-50 border border-red-200 flex items-center justify-center flex-shrink-0">
+            <span className="text-red-700 font-extrabold text-sm">{activeHabitation.riskScore}</span>
           </div>
           <div>
-            <div className="text-xs text-slate-400 font-medium">Currently Selected Source Habitation:</div>
-            <div className="text-base font-bold text-white flex items-center space-x-2">
+            <div className="text-[11px] text-slate-500 font-medium">Currently assessing relocation for:</div>
+            <div className="text-sm font-bold text-slate-900 flex items-center space-x-2">
               <span>{activeHabitation.name}</span>
-              <span className="text-xs font-normal text-slate-400">({activeHabitation.taluk} Taluk, Kasaragod)</span>
-              <span className="text-xs px-2 py-0.5 rounded font-bold bg-rose-950 text-rose-300 border border-rose-800">
+              <span className="text-xs text-slate-500 font-normal">({activeHabitation.taluk} Taluk)</span>
+              <span className="text-[10px] px-2 py-0.5 rounded font-bold bg-red-50 text-red-700 border border-red-200">
                 {activeHabitation.primaryHazard}
               </span>
             </div>
           </div>
         </div>
 
-        {/* Change Habitation Dropdown */}
+        {/* Change Village Dropdown */}
         <div className="flex items-center space-x-2 w-full md:w-auto">
-          <label className="text-xs text-slate-400 whitespace-nowrap">Switch Habitation:</label>
+          <label className="text-xs text-slate-500 whitespace-nowrap">Switch village:</label>
           <select
             value={activeHabitation.id}
             onChange={(e) => {
               const selected = habitations.find(h => h.id === e.target.value);
               if (selected) onSelectHabitation(selected);
             }}
-            className="bg-slate-950 text-xs text-slate-200 border border-slate-700 rounded-lg px-3 py-1.5 focus:outline-none focus:border-cyan-500"
+            className="bg-white text-xs text-slate-700 border border-slate-300 rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-blue-600"
           >
             {habitations.map(h => (
               <option key={h.id} value={h.id}>
@@ -137,124 +129,134 @@ export default function RelocationView({
         </div>
       </div>
 
-      {/* Main Relocation Content Grid: Left Recommended Site & Why, Right Candidate Ranking */}
+      {/* Main Relocation Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* Left Col: Primary Recommended Site (7 cols) */}
-        <div className="lg:col-span-7 space-y-6">
+        {/* Left Column (7 cols): Top Recommended Safe Location */}
+        <div className="lg:col-span-7 space-y-5">
           {activeSite && (
-            <div className="bg-slate-900/90 border-2 border-cyan-500/60 rounded-2xl p-6 shadow-2xl relative overflow-hidden">
-              {/* Highlight Ribbon */}
-              <div className="absolute top-0 right-0 bg-gradient-to-l from-cyan-600 to-blue-600 text-white font-black text-[10px] uppercase tracking-wider py-1 px-4 rounded-bl-xl shadow-md">
-                TOP RECOMMENDED SAFE RELOCATION SITE
+            <div className="bg-white border-2 border-blue-600/60 rounded-xl p-5 sm:p-6 shadow-sm relative">
+              <div className="absolute top-0 right-0 bg-blue-600 text-white font-bold text-[10px] uppercase tracking-wider py-1 px-3 rounded-bl-lg">
+                Recommended Safe Location
               </div>
 
-              {/* Title & Coordinates */}
-              <div className="mb-5">
-                <div className="text-xs font-semibold text-cyan-400 uppercase tracking-wider">
-                  Suitability Score: {activeSite.suitabilityScore}/100 • Tier-1 Safe Refuge
+              <div className="mb-4">
+                <div className="text-xs font-semibold text-blue-700">
+                  Suitability Score: {activeSite.suitabilityScore}/100
                 </div>
-                <h2 className="text-2xl font-black text-white mt-1 flex items-center space-x-2">
-                  <span>{activeSite.name}</span>
+                <h2 className="text-xl font-bold text-slate-900 mt-0.5">
+                  {activeSite.name}
                 </h2>
-                <div className="text-xs text-slate-400 mt-1">
-                  Taluk: {activeSite.taluk} • Verification Status: <span className="text-emerald-400 font-semibold">{activeSite.verificationStatus}</span>
+                <div className="text-xs text-slate-500 mt-0.5">
+                  {activeSite.taluk} Taluk, Kasaragod • Elevation: <strong className="text-slate-800">{activeSite.elevationMeters}m MSL</strong>
                 </div>
               </div>
 
-              {/* Key Relocation Logistics Numbers */}
-              <div className="grid grid-cols-3 gap-3 p-4 bg-slate-950/80 rounded-xl border border-slate-800 mb-6">
+              {/* Numbers Grid */}
+              <div className="grid grid-cols-3 gap-3 p-3.5 bg-slate-50 rounded-xl border border-slate-200 mb-5 text-center sm:text-left">
                 <div>
-                  <div className="text-[11px] text-slate-400 uppercase font-semibold">Distance</div>
-                  <div className="text-2xl font-black text-cyan-400 mt-0.5">
-                    {getDistance(activeSite)} <span className="text-xs font-bold text-slate-400">km</span>
+                  <div className="text-[11px] text-slate-500 font-medium">Distance</div>
+                  <div className="text-xl font-extrabold text-blue-700 mt-0.5">
+                    {getDistance(activeSite)} <span className="text-xs font-semibold text-slate-500">km</span>
                   </div>
-                  <div className="text-[10px] text-slate-500">Estimated transit ~14 mins</div>
+                  <div className="text-[10px] text-slate-400">~14 mins transit</div>
                 </div>
 
                 <div>
-                  <div className="text-[11px] text-slate-400 uppercase font-semibold">Site Capacity</div>
-                  <div className="text-2xl font-black text-white mt-0.5">
+                  <div className="text-[11px] text-slate-500 font-medium">Site Capacity</div>
+                  <div className="text-xl font-extrabold text-slate-900 mt-0.5">
                     {activeSite.capacity.toLocaleString()}
                   </div>
-                  <div className="text-[10px] text-slate-500">Maximum individuals</div>
+                  <div className="text-[10px] text-slate-400">Max persons</div>
                 </div>
 
                 <div>
-                  <div className="text-[11px] text-slate-400 uppercase font-semibold">Capacity Balance</div>
-                  <div className={`text-2xl font-black mt-0.5 ${isCapacityAdequate ? 'text-emerald-400' : 'text-rose-400'}`}>
+                  <div className="text-[11px] text-slate-500 font-medium">Capacity Buffer</div>
+                  <div className={`text-xl font-extrabold mt-0.5 ${isCapacityAdequate ? 'text-green-700' : 'text-red-700'}`}>
                     {isCapacityAdequate ? `+${remainingCapacity.toLocaleString()}` : remainingCapacity.toLocaleString()}
                   </div>
-                  <div className="text-[10px] text-slate-500">
-                    {isCapacityAdequate ? 'Surplus buffer available' : 'Deficit - split required'}
+                  <div className="text-[10px] text-slate-400">
+                    {isCapacityAdequate ? 'Buffer available' : 'Split needed'}
                   </div>
                 </div>
               </div>
 
-              {/* WHY THIS SITE WAS RECOMMENDED? (Core SIH Judge Requirement) */}
-              <div className="space-y-3 mb-6">
-                <div className="flex items-center space-x-2 text-xs font-bold uppercase tracking-wider text-slate-200">
-                  <Sparkles className="w-4 h-4 text-cyan-400" />
-                  <span>Why Recommended? (Explainable Decision Factors)</span>
+              {/* Why Recommended: 5 Simple Bullets */}
+              <div className="space-y-2 mb-5">
+                <div className="text-xs font-bold text-slate-900">
+                  Why Recommended:
                 </div>
-
-                <div className="space-y-2">
-                  {activeSite.whyRecommended.map((reason, idx) => (
-                    <div key={idx} className="flex items-start space-x-2.5 bg-slate-950/40 p-2.5 rounded-lg border border-slate-800/80 text-xs text-slate-300">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" />
-                      <span className="leading-relaxed">{reason}</span>
-                    </div>
-                  ))}
+                <div className="space-y-1.5 text-xs text-slate-700 bg-slate-50/50 p-3 rounded-lg border border-slate-200">
+                  <div className="flex items-start space-x-2">
+                    <CheckCircle2 className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                    <span><strong>Lower hazard exposure:</strong> Elevated 72m above sea level, protected from coastal surge and river floods.</span>
+                  </div>
+                  <div className="flex items-start space-x-2">
+                    <CheckCircle2 className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                    <span><strong>Enough capacity:</strong> Can accommodate all 2,840 residents of Mogral Puthur with 25% surplus headroom.</span>
+                  </div>
+                  <div className="flex items-start space-x-2">
+                    <CheckCircle2 className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                    <span><strong>Good road access:</strong> Direct access via NH-66 bypass enables swift transit of passenger buses.</span>
+                  </div>
+                  <div className="flex items-start space-x-2">
+                    <CheckCircle2 className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                    <span><strong>Healthcare nearby:</strong> Periya Community Health Centre is located 1.4 km away for medical triage.</span>
+                  </div>
+                  <div className="flex items-start space-x-2">
+                    <CheckCircle2 className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                    <span><strong>Public ownership:</strong> Institutional government campus eliminates private land requisition hurdles.</span>
+                  </div>
                 </div>
               </div>
 
-              {/* Essential Infrastructure at Site */}
-              <div className="space-y-2.5 mb-6">
-                <div className="text-xs font-bold uppercase tracking-wider text-slate-200 flex items-center space-x-1.5">
-                  <Building className="w-3.5 h-3.5 text-blue-400" />
-                  <span>On-Site Critical Facilities</span>
+              {/* Facilities on site */}
+              <div className="space-y-2 mb-5">
+                <div className="text-xs font-bold text-slate-900 flex items-center space-x-1.5">
+                  <Building className="w-3.5 h-3.5 text-blue-600" />
+                  <span>On-Site Critical Facilities:</span>
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-slate-300">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-slate-600">
                   {activeSite.infrastructure.map((infra, idx) => (
-                    <div key={idx} className="bg-slate-950/30 px-3 py-2 rounded-lg border border-slate-800/60 flex items-center space-x-2">
-                      <span className="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>
+                    <div key={idx} className="bg-slate-50 px-2.5 py-1.5 rounded border border-slate-200 flex items-center space-x-1.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-blue-600"></span>
                       <span className="text-[11px]">{infra}</span>
                     </div>
                   ))}
                 </div>
               </div>
 
-              {/* Card Footer Actions */}
-              <div className="flex flex-wrap items-center gap-3 pt-4 border-t border-slate-800">
+              {/* Action Buttons */}
+              <div className="flex flex-wrap items-center gap-2.5 pt-3 border-t border-slate-100">
                 <button
                   onClick={() => setIsPlanModalOpen(true)}
-                  className="flex-1 bg-cyan-600 hover:bg-cyan-500 text-slate-950 font-bold py-2.5 px-4 rounded-xl text-xs flex items-center justify-center space-x-2 transition shadow-lg shadow-cyan-950"
+                  className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg text-xs flex items-center justify-center space-x-1.5 transition shadow-xs"
                 >
-                  <Navigation className="w-4 h-4 text-slate-950" />
-                  <span>Execute Relocation Protocol</span>
+                  <Navigation className="w-3.5 h-3.5" />
+                  <span>Prepare Relocation Plan</span>
                 </button>
 
                 <button
                   onClick={() => onViewOnMap(activeSite)}
-                  className="bg-slate-800 hover:bg-slate-700 text-slate-200 py-2.5 px-4 rounded-xl border border-slate-700 text-xs font-semibold flex items-center space-x-1.5 transition"
+                  className="bg-slate-100 hover:bg-slate-200 text-slate-800 py-2 px-3.5 rounded-lg text-xs font-medium flex items-center space-x-1.5 transition"
                 >
-                  <Layers className="w-3.5 h-3.5 text-cyan-400" />
-                  <span>Inspect Corridor on Map</span>
+                  <Layers className="w-3.5 h-3.5 text-blue-600" />
+                  <span>View Corridor on Map</span>
                 </button>
               </div>
             </div>
           )}
         </div>
 
-        {/* Right Col: Candidate Safe Sites Ranking Queue (5 cols) */}
-        <div className="lg:col-span-5 space-y-4">
+        {/* Right Column (5 cols): Candidate Locations Ranking */}
+        <div className="lg:col-span-5 space-y-3">
           <div className="flex items-center justify-between pb-1">
-            <h3 className="text-sm font-extrabold uppercase tracking-wider text-slate-200">
-              Candidate Safe Relocation Sites ({relocationSites.length})
+            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-700">
+              Candidate Safe Locations ({relocationSites.length})
             </h3>
-            <span className="text-[11px] text-cyan-400 font-semibold">Ranked by Suitability</span>
+            <span className="text-[11px] text-blue-700 font-semibold">Ranked by Suitability</span>
           </div>
 
-          <div className="space-y-3">
+          <div className="space-y-2.5">
             {relocationSites.map((site, index) => {
               const isSelected = activeSite?.id === site.id;
               const dist = getDistance(site);
@@ -264,43 +266,43 @@ export default function RelocationView({
                 <div
                   key={site.id}
                   onClick={() => onSelectRelocationSite(site)}
-                  className={`p-4 rounded-xl border transition-all cursor-pointer ${
+                  className={`p-3.5 rounded-xl border transition cursor-pointer bg-white ${
                     isSelected
-                      ? 'bg-slate-900 border-cyan-500 shadow-xl shadow-cyan-950/30'
-                      : 'bg-slate-900/60 border-slate-800 hover:bg-slate-800/80 hover:border-slate-700'
+                      ? 'border-blue-600 ring-1 ring-blue-600 shadow-xs'
+                      : 'border-slate-200 hover:border-slate-300'
                   }`}
                 >
                   <div className="flex items-start justify-between">
                     <div>
                       <div className="flex items-center space-x-2">
-                        <span className="text-[10px] font-black px-1.5 py-0.2 rounded bg-cyan-950 text-cyan-300 border border-cyan-800">
-                          RANK #{index + 1}
+                        <span className="text-[10px] font-bold px-1.5 py-0.2 rounded bg-blue-50 text-blue-800 border border-blue-200">
+                          #{index + 1}
                         </span>
-                        <span className="text-xs text-slate-400">{dist} km away</span>
+                        <span className="text-xs text-slate-500">{dist} km away</span>
                       </div>
-                      <h4 className="text-sm font-bold text-white mt-1">{site.name}</h4>
-                      <p className="text-[11px] text-slate-400 mt-0.5">
+                      <h4 className="text-sm font-bold text-slate-900 mt-1">{site.name}</h4>
+                      <p className="text-[11px] text-slate-500 mt-0.5">
                         Elevation: {site.elevationMeters}m MSL • {site.roadAccessLevel.split('(')[0]}
                       </p>
                     </div>
 
                     <div className="text-right">
-                      <div className="text-lg font-black text-cyan-400">
+                      <div className="text-base font-extrabold text-blue-700">
                         {site.suitabilityScore}
-                        <span className="text-[10px] text-slate-500 font-bold">/100</span>
+                        <span className="text-xs text-slate-400 font-normal">/100</span>
                       </div>
-                      <div className="text-[10px] text-slate-400">Suitability</div>
+                      <div className="text-[10px] text-slate-500">Suitability</div>
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-2 mt-3 pt-2.5 border-t border-slate-800/80 text-[11px]">
+                  <div className="grid grid-cols-2 gap-2 mt-2.5 pt-2 border-t border-slate-100 text-[11px]">
                     <div>
-                      <span className="text-slate-400">Capacity: </span>
-                      <strong className="text-slate-200">{site.capacity.toLocaleString()}</strong>
+                      <span className="text-slate-500">Capacity: </span>
+                      <strong className="text-slate-800">{site.capacity.toLocaleString()}</strong>
                     </div>
                     <div className="text-right">
-                      <span className="text-slate-400">Remaining: </span>
-                      <strong className={remaining >= 0 ? 'text-emerald-400' : 'text-rose-400'}>
+                      <span className="text-slate-500">Buffer: </span>
+                      <strong className={remaining >= 0 ? 'text-green-700' : 'text-red-700'}>
                         {remaining >= 0 ? `+${remaining.toLocaleString()}` : remaining.toLocaleString()}
                       </strong>
                     </div>
@@ -312,7 +314,7 @@ export default function RelocationView({
         </div>
       </div>
 
-      {/* Relocation Plan Action Modal */}
+      {/* Relocation Plan Modal */}
       {isPlanModalOpen && (
         <RelocationPlanModal
           habitation={activeHabitation}

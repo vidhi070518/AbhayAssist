@@ -16,10 +16,9 @@ import { RELOCATION_SITES_DATA } from './data/relocationSitesData';
 import { INFRASTRUCTURE_DATA } from './data/infrastructureData';
 
 export default function App() {
-  // Navigation State
   const [activeTab, setActiveTab] = useState('overview');
 
-  // Shared Core Data State (Ensures 100% Data Consistency across entire app)
+  // Shared Datasets
   const [habitations] = useState(HABITATIONS_DATA);
   const [relocationSites] = useState(RELOCATION_SITES_DATA);
   const [infrastructure] = useState(INFRASTRUCTURE_DATA);
@@ -29,10 +28,8 @@ export default function App() {
   const [selectedRelocationSite, setSelectedRelocationSite] = useState(RELOCATION_SITES_DATA[0]);
   const [isRelocationMode, setIsRelocationMode] = useState(false);
 
-  // Handlers for cross-component interactions
   const handleSelectHabitation = (habitation) => {
     setSelectedHabitation(habitation);
-    // Find matching recommended site
     const matchingSite = relocationSites.find(s => s.id === habitation.recommendedRelocationSiteId) || relocationSites[0];
     setSelectedRelocationSite(matchingSite);
   };
@@ -73,18 +70,17 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#0a0f1d] text-slate-100 font-sans">
-      {/* Top Prototype Disclaimer */}
+    <div className="min-h-screen flex flex-col bg-slate-50 text-slate-900 font-sans">
       <DisclaimerBanner />
 
-      {/* Main Government Intelligence Navbar */}
+      {/* Government-Grade Light Navbar */}
       <Navbar
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         alertCount={2}
       />
 
-      {/* Main View Router */}
+      {/* Main View Area */}
       <main className="flex-1 flex flex-col overflow-hidden">
         {/* VIEW 1: OVERVIEW DASHBOARD */}
         {activeTab === 'overview' && (
@@ -101,10 +97,10 @@ export default function App() {
           </div>
         )}
 
-        {/* VIEW 2: RISK MAP (CENTERPIECE: 65-70% Map, 30-35% Detail Panel on Desktop) */}
+        {/* VIEW 2: RISK MAP (MAIN CENTERPIECE: 68% MAP LEFT, 32% INFORMATION RIGHT) */}
         {activeTab === 'map' && (
-          <div className="flex-1 flex flex-col lg:flex-row h-[calc(100vh-6.5rem)] overflow-hidden">
-            {/* Desktop: 68% Map / Mobile: 58% Map */}
+          <div className="flex-1 flex flex-col lg:flex-row h-[calc(100vh-4rem)] overflow-hidden">
+            {/* Left: Interactive Real GIS Map */}
             <div className="w-full lg:w-[68%] h-[58vh] lg:h-full relative flex-1">
               <InteractiveMap
                 habitations={habitations}
@@ -120,8 +116,8 @@ export default function App() {
               />
             </div>
 
-            {/* Desktop: 32% Risk Panel / Mobile: Bottom Panel */}
-            <div className="w-full lg:w-[32%] h-[42vh] lg:h-full border-t lg:border-t-0 lg:border-l border-slate-800 bg-slate-900/95 overflow-y-auto">
+            {/* Right: Selected Location Information Panel */}
+            <div className="w-full lg:w-[32%] h-[42vh] lg:h-full border-t lg:border-t-0 lg:border-l border-slate-200 bg-white overflow-y-auto shadow-xs">
               <RiskDetailPanel
                 habitation={selectedHabitation}
                 onFindSafeSites={handleOpenFindSafeSites}
@@ -132,7 +128,7 @@ export default function App() {
           </div>
         )}
 
-        {/* VIEW 3: PRIORITY QUEUE */}
+        {/* VIEW 3: PRIORITY AREAS */}
         {activeTab === 'priority' && (
           <div className="flex-1 overflow-y-auto">
             <PriorityQueue
@@ -145,7 +141,7 @@ export default function App() {
           </div>
         )}
 
-        {/* VIEW 4: RELOCATION HUB (CORE DIFFERENTIATOR) */}
+        {/* VIEW 4: RELOCATION HUB (FIND SAFER LOCATIONS) */}
         {activeTab === 'relocation' && (
           <div className="flex-1 overflow-y-auto">
             <RelocationView
@@ -160,7 +156,7 @@ export default function App() {
           </div>
         )}
 
-        {/* VIEW 5: SCENARIO SIMULATION ("WHAT IF?" SENSITIVITY) */}
+        {/* VIEW 5: SCENARIO PLANNING */}
         {activeTab === 'simulation' && (
           <div className="flex-1 overflow-y-auto">
             <ScenarioSimulator
@@ -172,7 +168,7 @@ export default function App() {
           </div>
         )}
 
-        {/* VIEW 6: ALERTS (OFFICIAL SACHET vs AI RISK SIGNALS) */}
+        {/* VIEW 6: ALERTS */}
         {activeTab === 'alerts' && (
           <div className="flex-1 overflow-y-auto">
             <AlertsView
@@ -181,7 +177,7 @@ export default function App() {
           </div>
         )}
 
-        {/* VIEW 7: DATA & SOURCES */}
+        {/* VIEW 7: ABOUT DATA */}
         {activeTab === 'datasources' && (
           <div className="flex-1 overflow-y-auto">
             <DataSourcesView />
@@ -189,16 +185,15 @@ export default function App() {
         )}
       </main>
 
-      {/* Status Footer */}
-      <footer className="bg-slate-950 border-t border-slate-800/80 py-2.5 px-4 text-[11px] text-slate-400 flex flex-wrap items-center justify-between gap-2">
+      {/* Government-Grade Light Footer */}
+      <footer className="bg-white border-t border-slate-200 py-2.5 px-4 text-[11px] text-slate-500 flex flex-wrap items-center justify-between gap-2">
         <div className="flex items-center space-x-2">
-          <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
-          <span>AbhayAssist Decision-Support Engine v1.0 (Kasaragod Pilot)</span>
+          <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+          <span>AbhayAssist Disaster Decision-Support Platform • Kasaragod Operations Pilot</span>
         </div>
-        <div className="flex items-center space-x-4">
-          <span>Target District: Kasaragod, Kerala</span>
-          <span>Data References: Bhuvan • NDEM • SACHET</span>
-          <span className="text-cyan-400 font-semibold">Smart India Hackathon 2026</span>
+        <div className="flex items-center space-x-4 text-slate-400">
+          <span>Kasaragod, Kerala</span>
+          <span>Bhuvan • NDEM • SACHET</span>
         </div>
       </footer>
     </div>

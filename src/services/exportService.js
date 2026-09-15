@@ -1,12 +1,12 @@
 /**
- * Relocation Mitigation Action Brief Export Service
- * Generates an executive decision-support brief suitable for District Disaster Management Authorities.
+ * Relocation Action Brief Export Service
+ * Generates an executive decision-support brief for Disaster Management Authorities.
  */
 
 export function exportRelocationBrief({ habitation, relocationSite, assessmentData }) {
   const printWindow = window.open('', '_blank', 'width=900,height=1000');
   if (!printWindow) {
-    alert('Please allow popups to export the official Relocation Action Brief.');
+    alert('Please allow popups to print or export the Relocation Action Brief.');
     return;
   }
 
@@ -25,77 +25,78 @@ export function exportRelocationBrief({ habitation, relocationSite, assessmentDa
     <html lang="en">
     <head>
       <meta charset="UTF-8">
-      <title>AbhayAssist - Relocation Mitigation Action Brief: ${habitation.name}</title>
+      <title>AbhayAssist - Relocation Action Brief: ${habitation.name}</title>
       <style>
         @page {
           size: A4;
-          margin: 18mm;
+          margin: 16mm;
         }
         body {
-          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-          color: #1e293b;
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+          color: #0f172a;
           line-height: 1.5;
           margin: 0;
           padding: 24px;
+          background: #ffffff;
         }
         .header {
-          border-bottom: 3px solid #0f172a;
+          border-bottom: 2px solid #1e40af;
           padding-bottom: 16px;
-          margin-bottom: 24px;
+          margin-bottom: 20px;
           display: flex;
           justify-content: space-between;
           align-items: flex-start;
         }
         .header h1 {
           margin: 0;
-          font-size: 24px;
-          color: #0f172a;
-          letter-spacing: -0.5px;
+          font-size: 22px;
+          color: #1e3a8a;
+          letter-spacing: -0.3px;
         }
         .header .badge {
           display: inline-block;
           background: #fee2e2;
-          color: #991b1b;
+          color: #b91c1c;
           font-weight: 700;
-          font-size: 12px;
+          font-size: 11px;
           padding: 4px 10px;
           border-radius: 4px;
-          border: 1px solid #f87171;
+          border: 1px solid #fca5a5;
           margin-top: 6px;
         }
         .meta-info {
           font-size: 12px;
-          color: #64748b;
+          color: #475569;
           text-align: right;
         }
         .section-title {
-          font-size: 15px;
+          font-size: 14px;
           font-weight: 700;
           text-transform: uppercase;
-          color: #334155;
+          color: #1e3a8a;
           border-bottom: 1px solid #cbd5e1;
           padding-bottom: 6px;
-          margin-top: 24px;
-          margin-bottom: 12px;
+          margin-top: 20px;
+          margin-bottom: 10px;
         }
         .grid-2 {
           display: grid;
           grid-template-columns: 1fr 1fr;
-          gap: 20px;
+          gap: 16px;
         }
         .card {
           background: #f8fafc;
           border: 1px solid #e2e8f0;
           border-radius: 8px;
-          padding: 16px;
+          padding: 14px;
         }
         .metric-val {
-          font-size: 26px;
+          font-size: 24px;
           font-weight: 800;
           color: #0f172a;
         }
         .metric-label {
-          font-size: 12px;
+          font-size: 11px;
           color: #64748b;
           text-transform: uppercase;
           letter-spacing: 0.5px;
@@ -105,15 +106,16 @@ export function exportRelocationBrief({ habitation, relocationSite, assessmentDa
           padding-left: 20px;
         }
         li {
-          margin-bottom: 6px;
-          font-size: 13px;
+          margin-bottom: 5px;
+          font-size: 12.5px;
+          color: #334155;
         }
         .checklist-item {
           display: flex;
           align-items: center;
           gap: 8px;
-          font-size: 13px;
-          padding: 6px 0;
+          font-size: 12.5px;
+          padding: 5px 0;
           border-bottom: 1px dotted #e2e8f0;
         }
         .check-box {
@@ -123,23 +125,23 @@ export function exportRelocationBrief({ habitation, relocationSite, assessmentDa
           border-radius: 3px;
           display: inline-block;
         }
-        .disclaimer {
-          margin-top: 36px;
-          padding: 12px;
-          background: #f1f5f9;
-          border-left: 4px solid #64748b;
-          font-size: 11px;
-          color: #475569;
-        }
         .action-banner {
           background: #f0fdf4;
           border: 1px solid #86efac;
           color: #166534;
-          padding: 12px;
+          padding: 10px 14px;
           border-radius: 6px;
           font-weight: 600;
-          font-size: 13px;
-          margin-top: 18px;
+          font-size: 12.5px;
+          margin-top: 16px;
+        }
+        .footer-note {
+          margin-top: 30px;
+          padding: 10px;
+          background: #f8fafc;
+          border-left: 3px solid #94a3b8;
+          font-size: 11px;
+          color: #64748b;
         }
       </style>
     </head>
@@ -148,30 +150,30 @@ export function exportRelocationBrief({ habitation, relocationSite, assessmentDa
         <div>
           <h1>ABHAYASSIST — RELOCATION ACTION BRIEF</h1>
           <div style="font-size: 13px; color: #475569; margin-top: 2px;">
-            State & District Disaster Management Decision-Support Platform (SIH-2026)
+            Disaster Decision-Support & Relocation Platform
           </div>
-          <div class="badge">URGENT: HIGH RELOCATION PRIORITY</div>
+          <div class="badge">HIGH RELOCATION PRIORITY</div>
         </div>
         <div class="meta-info">
           <div><strong>District:</strong> Kasaragod, Kerala</div>
           <div><strong>Generated:</strong> ${currentDate}</div>
-          <div><strong>Document ID:</strong> ABHAY-RELOC-${habitation.id.toUpperCase()}</div>
+          <div><strong>Reference:</strong> ABHAY-RELOC-${habitation.id.toUpperCase()}</div>
         </div>
       </div>
 
       <div class="grid-2">
         <div class="card">
-          <div class="metric-label">High-Risk Source Habitation</div>
-          <div style="font-size: 18px; font-weight: 700; margin-top: 4px; color: #0f172a;">${habitation.name}</div>
-          <div style="font-size: 13px; color: #64748b;">Taluk: ${habitation.taluk} | Primary Hazard: ${habitation.primaryHazard}</div>
-          <div style="display: flex; gap: 24px; margin-top: 14px;">
+          <div class="metric-label">High-Risk Habitation</div>
+          <div style="font-size: 17px; font-weight: 700; margin-top: 4px; color: #0f172a;">${habitation.name}</div>
+          <div style="font-size: 12px; color: #64748b;">Taluk: ${habitation.taluk} | Concern: ${habitation.primaryHazard}</div>
+          <div style="display: flex; gap: 20px; margin-top: 12px;">
             <div>
               <div class="metric-val" style="color: #dc2626;">${assessmentData ? assessmentData.riskScore : habitation.riskScore}/100</div>
               <div class="metric-label">Overall Risk</div>
             </div>
             <div>
               <div class="metric-val">${habitation.population.toLocaleString()}</div>
-              <div class="metric-label">Residents Exposed</div>
+              <div class="metric-label">People at Risk</div>
             </div>
             <div>
               <div class="metric-val">${habitation.households}</div>
@@ -181,28 +183,28 @@ export function exportRelocationBrief({ habitation, relocationSite, assessmentDa
         </div>
 
         <div class="card">
-          <div class="metric-label">Recommended Safe Relocation Destination</div>
-          <div style="font-size: 18px; font-weight: 700; margin-top: 4px; color: #0891b2;">${relocationSite.name}</div>
-          <div style="font-size: 13px; color: #64748b;">Elevation: ${relocationSite.elevationMeters}m MSL | Access: ${relocationSite.roadAccessLevel}</div>
-          <div style="display: flex; gap: 24px; margin-top: 14px;">
+          <div class="metric-label">Recommended Safe Location</div>
+          <div style="font-size: 17px; font-weight: 700; margin-top: 4px; color: #1d4ed8;">${relocationSite.name}</div>
+          <div style="font-size: 12px; color: #64748b;">Elevation: ${relocationSite.elevationMeters}m MSL | Access: ${relocationSite.roadAccessLevel}</div>
+          <div style="display: flex; gap: 20px; margin-top: 12px;">
             <div>
-              <div class="metric-val" style="color: #0891b2;">${relocationSite.suitabilityScore}/100</div>
+              <div class="metric-val" style="color: #1d4ed8;">${relocationSite.suitabilityScore}/100</div>
               <div class="metric-label">Suitability</div>
             </div>
             <div>
               <div class="metric-val">${relocationSite.capacity.toLocaleString()}</div>
-              <div class="metric-label">Site Capacity</div>
+              <div class="metric-label">Capacity</div>
             </div>
             <div>
               <div class="metric-val" style="color: #16a34a;">+${remainingCapacity.toLocaleString()}</div>
-              <div class="metric-label">Buffer Margin</div>
+              <div class="metric-label">Buffer</div>
             </div>
           </div>
         </div>
       </div>
 
       <div class="action-banner">
-        RECOMMENDED DECISION: ${habitation.fieldAction || 'Initiate Stage-1 Pre-emptive Relocation Protocol.'}
+        RECOMMENDED ACTION: ${habitation.fieldAction || 'Initiate Stage-1 planned relocation protocol.'}
       </div>
 
       <div class="section-title">Why this Area is at Risk</div>
@@ -215,22 +217,22 @@ export function exportRelocationBrief({ habitation, relocationSite, assessmentDa
         ${relocationSite.whyRecommended.map(item => `<li>${item}</li>`).join('')}
       </ul>
 
-      <div class="section-title">Available Infrastructure at Safe Site</div>
+      <div class="section-title">Critical Facilities at Site</div>
       <ul>
         ${relocationSite.infrastructure.map(item => `<li>${item}</li>`).join('')}
       </ul>
 
       <div class="section-title">Field Verification & Dispatch Checklist</div>
       <div>
-        <div class="checklist-item"><span class="check-box"></span> Confirm NH-66 transit corridor passability with Kasaragod Traffic Control.</div>
-        <div class="checklist-item"><span class="check-box"></span> Pre-alert ${relocationSite.nearestHospital} to stage mobile medical triage unit.</div>
-        <div class="checklist-item"><span class="check-box"></span> Mobilize 40 KSRTC state transport buses for prioritized vulnerable transit.</div>
-        <div class="checklist-item"><span class="check-box"></span> Verify backup diesel generator (120 kVA) and clean water reserves at campus.</div>
-        <div class="checklist-item"><span class="check-box"></span> Dispatch civil defense volunteers for household-level verification.</div>
+        <div class="checklist-item"><span class="check-box"></span> Confirm NH-66 transit corridor passability with traffic control.</div>
+        <div class="checklist-item"><span class="check-box"></span> Pre-alert ${relocationSite.nearestHospital} to stage mobile medical team.</div>
+        <div class="checklist-item"><span class="check-box"></span> Mobilize 40 KSRTC buses for prioritized community transit.</div>
+        <div class="checklist-item"><span class="check-box"></span> Verify backup generator and drinking water reserves at campus.</div>
+        <div class="checklist-item"><span class="check-box"></span> Dispatch local team for household-level verification.</div>
       </div>
 
-      <div class="disclaimer">
-        <strong>IMPORTANT PROTOTYPE DISCLAIMER:</strong> AbhayAssist is a Smart India Hackathon (SIH) prototype platform. Risk assessments, population vulnerability indicators, and relocation suitability scores shown in this brief are prototype calculations referencing Bhuvan, NDEM, and SACHET frameworks. For official operational deployment, verify through District Collectorate Kasaragod.
+      <div class="footer-note">
+        <strong>Official Notice:</strong> Generated by AbhayAssist decision-support platform for Kasaragod District Emergency Operations Centre. Subject to field inspection prior to evacuation order.
       </div>
 
       <script>

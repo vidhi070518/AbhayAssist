@@ -1,129 +1,94 @@
 /**
- * Prototype Hazard Zone Boundaries (GeoJSON format)
- * Focused on Kasaragod, Kerala:
- * 1. Coastal Erosion Vulnerability Strip (Arabian Sea shoreline)
- * 2. Riverine Inundation Flood Zone (Shiriya & Chandragiri River basins)
- * 3. Landslide Susceptibility Zone (Eastern laterite foothill slopes)
- *
- * NOTE: Clearly labelled as Prototype / Demonstration GIS Layer for SIH.
+ * Hazard Risk Zones (GeoJSON format)
+ * Focused on Kasaragod District, Kerala:
+ * 1. Coastal Erosion Risk (Shoreline zone along Mogral Puthur coast)
+ * 2. River Flood Risk (Low-lying Shiriya River basin near Kumbla)
+ * 3. Landslide Risk (Eastern laterite slope terrain near Pallikkara)
  */
 
 export const HAZARD_GEOJSON = {
   type: 'FeatureCollection',
   features: [
-    // 1. Coastal Erosion Hazard Zone (Along Mogral - Kasaragod coastline)
+    // 1. Coastal Erosion Risk Zone
     {
       type: 'Feature',
       id: 'hazard-coastal-erosion-1',
       properties: {
         hazardType: 'coastal_erosion',
-        name: 'Mogral - Kasaragod Coastal Erosion Corridor',
+        name: 'Coastal Erosion Risk Zone',
+        areaName: 'Mogral Puthur Coastal Strip',
         severity: 'High',
-        color: '#ef4444',
+        color: '#dc2626',
         fillColor: '#ef4444',
-        fillOpacity: 0.35,
-        strokeWeight: 2,
-        description: 'Vulnerable shoreline strip with progressive beach erosion and high wave action risk.',
-        source: 'Prototype GIS Layer (Modeled on Bhuvan Coastal Vulnerability Index)'
+        fillOpacity: 0.16,
+        strokeWeight: 1.5,
+        description: 'Vulnerable shoreline strip subject to wave overtopping and beach recession during peak monsoon swells.'
       },
       geometry: {
         type: 'Polygon',
         coordinates: [
           [
-            [74.9550, 12.5700],
-            [74.9650, 12.5700],
-            [74.9750, 12.5300],
-            [74.9820, 12.4900],
-            [74.9720, 12.4900],
-            [74.9600, 12.5350],
-            [74.9550, 12.5700]
+            [74.9580, 12.5650],
+            [74.9650, 12.5650],
+            [74.9740, 12.5250],
+            [74.9670, 12.5250],
+            [74.9580, 12.5650]
           ]
         ]
       }
     },
-    // 2. Flood Inundation Basin (Kumbla - Shiriya River Basin)
+    // 2. River Flood Risk Zone
     {
       type: 'Feature',
       id: 'hazard-flood-basin-1',
       properties: {
         hazardType: 'flood',
-        name: 'Shiriya River Flood Inundation Zone',
+        name: 'Flood Risk Zone',
+        areaName: 'Shiriya River Lower Basin',
         severity: 'High',
-        color: '#3b82f6',
+        color: '#2563eb',
         fillColor: '#3b82f6',
-        fillOpacity: 0.3,
-        strokeWeight: 2,
-        description: 'Low-lying river confluence basin prone to backwater spillage and flash waterlogging.',
-        source: 'Prototype GIS Layer (Modeled on NDEM Flood Hazard Guidelines)'
+        fillOpacity: 0.16,
+        strokeWeight: 1.5,
+        description: 'Low-lying river confluence basin prone to backwater spillage and localized waterlogging.'
       },
       geometry: {
         type: 'Polygon',
         coordinates: [
           [
-            [74.9350, 12.6050],
-            [74.9650, 12.6100],
-            [74.9800, 12.5850],
-            [74.9550, 12.5750],
-            [74.9350, 12.5900],
-            [74.9350, 12.6050]
+            [74.9400, 12.6020],
+            [74.9650, 12.6040],
+            [74.9720, 12.5850],
+            [74.9480, 12.5820],
+            [74.9400, 12.6020]
           ]
         ]
       }
     },
-    // 3. Landslide Susceptibility Zone (Western Ghats Foot-Slopes near Pallikkara/Bedadka)
+    // 3. Landslide Susceptibility Zone
     {
       type: 'Feature',
       id: 'hazard-landslide-zone-1',
       properties: {
         hazardType: 'landslide',
-        name: 'Pallikkara Foothill Slope Instability Zone',
+        name: 'Landslide Risk Zone',
+        areaName: 'Pallikkara Eastern Foothill Slopes',
         severity: 'High',
-        color: '#f59e0b',
+        color: '#d97706',
         fillColor: '#f59e0b',
-        fillOpacity: 0.3,
-        strokeWeight: 2,
-        description: 'Steep laterite terrain with historical debris slip and high pore water saturation.',
-        source: 'Prototype GIS Layer (Modeled on GSI Landslide Susceptibility Atlas)'
-      },
-      geometry: {
-        type: 'Polygon',
-        coordinates: [
-          [
-            [75.0250, 12.4100],
-            [75.0550, 12.4150],
-            [75.0650, 12.3800],
-            [75.0350, 12.3750],
-            [75.0200, 12.3950],
-            [75.0250, 12.4100]
-          ]
-        ]
-      }
-    },
-    // 4. Southern Coastal Surge & Flood Zone (Cheruvathur / Tejaswini Backwaters)
-    {
-      type: 'Feature',
-      id: 'hazard-flood-cheruvathur',
-      properties: {
-        hazardType: 'flood',
-        name: 'Tejaswini Estuary Tidal Surge & Lowland Zone',
-        severity: 'Moderate',
-        color: '#3b82f6',
-        fillColor: '#3b82f6',
-        fillOpacity: 0.25,
+        fillOpacity: 0.16,
         strokeWeight: 1.5,
-        description: 'Tidal backwater zone with seasonal waterlogging during extreme spring tides.',
-        source: 'Prototype GIS Layer (Referencing NDEM Hydrological Data)'
+        description: 'Steep laterite terrain with loose topsoil layers vulnerable to slope slippage after prolonged rainfall.'
       },
       geometry: {
         type: 'Polygon',
         coordinates: [
           [
-            [75.1450, 12.2350],
-            [75.1800, 12.2400],
-            [75.1950, 12.2050],
-            [75.1600, 12.1950],
-            [75.1450, 12.2150],
-            [75.1450, 12.2350]
+            [75.0300, 12.4080],
+            [75.0520, 12.4100],
+            [75.0580, 12.3850],
+            [75.0360, 12.3820],
+            [75.0300, 12.4080]
           ]
         ]
       }

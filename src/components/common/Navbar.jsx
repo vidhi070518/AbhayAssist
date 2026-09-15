@@ -1,47 +1,46 @@
 import React from 'react';
 import { 
-  ShieldAlert, 
+  ShieldCheck, 
   Map as MapIcon, 
   ListOrdered, 
   Navigation, 
   Sliders, 
   Bell, 
-  Database,
-  ExternalLink,
+  Info,
   Radio
 } from 'lucide-react';
 
 export default function Navbar({ activeTab, setActiveTab, alertCount = 2 }) {
   const navItems = [
-    { id: 'overview', label: 'Overview', icon: ShieldAlert },
+    { id: 'overview', label: 'Overview', icon: ShieldCheck },
     { id: 'map', label: 'Risk Map', icon: MapIcon, highlight: true },
-    { id: 'priority', label: 'Priority Queue', icon: ListOrdered },
+    { id: 'priority', label: 'Priority Areas', icon: ListOrdered },
     { id: 'relocation', label: 'Relocation Hub', icon: Navigation },
-    { id: 'simulation', label: 'Scenario Simulation', icon: Sliders },
+    { id: 'simulation', label: 'Scenario Planning', icon: Sliders },
     { id: 'alerts', label: 'Alerts', icon: Bell, badge: alertCount },
-    { id: 'datasources', label: 'Data & Sources', icon: Database },
+    { id: 'datasources', label: 'About Data', icon: Info },
   ];
 
   return (
-    <header className="bg-[#0f172a] border-b border-slate-800 sticky top-0 z-50">
+    <header className="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-xs">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Brand & Subtitle */}
           <div className="flex items-center space-x-3 cursor-pointer" onClick={() => setActiveTab('overview')}>
-            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-cyan-500 to-blue-700 flex items-center justify-center shadow-lg shadow-cyan-500/20 border border-cyan-400/30">
-              <ShieldAlert className="w-6 h-6 text-white" />
+            <div className="w-9 h-9 rounded-lg bg-blue-600 flex items-center justify-center text-white shadow-xs">
+              <ShieldCheck className="w-5 h-5 text-white" />
             </div>
             <div>
               <div className="flex items-center space-x-2">
-                <span className="font-extrabold text-xl tracking-tight text-white">
-                  ABHAY<span className="text-cyan-400">ASSIST</span>
+                <span className="font-extrabold text-lg text-slate-900 tracking-tight">
+                  Abhay<span className="text-blue-600">Assist</span>
                 </span>
-                <span className="px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider rounded bg-cyan-950 text-cyan-300 border border-cyan-800">
-                  SIH 2026
+                <span className="px-2 py-0.5 text-[10px] font-semibold rounded bg-slate-100 text-slate-700 border border-slate-200">
+                  Kasaragod
                 </span>
               </div>
-              <p className="text-[11px] text-slate-400 font-medium hidden sm:block">
-                Disaster Intelligence & Proactive Relocation Platform
+              <p className="text-[11px] text-slate-500 font-medium hidden sm:block">
+                Disaster Decision-Support & Proactive Relocation
               </p>
             </div>
           </div>
@@ -55,16 +54,16 @@ export default function Navbar({ activeTab, setActiveTab, alertCount = 2 }) {
                 <button
                   key={item.id}
                   onClick={() => setActiveTab(item.id)}
-                  className={`relative flex items-center space-x-1.5 px-3 py-2 rounded-md text-xs font-semibold transition-all ${
+                  className={`relative flex items-center space-x-1.5 px-3 py-2 rounded-md text-xs font-medium transition ${
                     isActive
-                      ? 'bg-slate-800 text-cyan-400 border border-slate-700 shadow-sm'
-                      : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
-                  } ${item.highlight && !isActive ? 'border border-cyan-500/30 text-cyan-200' : ''}`}
+                      ? 'bg-blue-50 text-blue-700 font-semibold'
+                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+                  }`}
                 >
-                  <Icon className={`w-4 h-4 ${isActive ? 'text-cyan-400' : 'text-slate-400'}`} />
+                  <Icon className={`w-4 h-4 ${isActive ? 'text-blue-600' : 'text-slate-500'}`} />
                   <span>{item.label}</span>
                   {item.badge && (
-                    <span className="ml-1 px-1.5 py-0.2 text-[10px] font-bold rounded-full bg-orange-600 text-white animate-pulse">
+                    <span className="ml-1 px-1.5 py-0.2 text-[10px] font-bold rounded-full bg-orange-600 text-white">
                       {item.badge}
                     </span>
                   )}
@@ -73,25 +72,26 @@ export default function Navbar({ activeTab, setActiveTab, alertCount = 2 }) {
             })}
           </nav>
 
-          {/* Right Status Badge */}
+          {/* Right Action & Operational Status */}
           <div className="flex items-center space-x-3">
-            <div className="hidden xl:flex items-center space-x-2 bg-slate-900/90 border border-slate-800 px-2.5 py-1.5 rounded-lg text-[11px]">
-              <Radio className="w-3.5 h-3.5 text-emerald-400 animate-pulse" />
-              <span className="text-slate-300">Kasaragod EOC Active</span>
+            <div className="hidden lg:flex items-center space-x-2 bg-slate-50 border border-slate-200 px-2.5 py-1.5 rounded-lg text-[11px] text-slate-600">
+              <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+              <span>Operations Centre Active</span>
             </div>
+
             <button
               onClick={() => setActiveTab('map')}
-              className="bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white px-3.5 py-1.5 rounded-lg text-xs font-semibold shadow-md shadow-cyan-900/40 border border-cyan-400/30 transition flex items-center space-x-1.5"
+              className="bg-blue-600 hover:bg-blue-700 text-white px-3.5 py-1.5 rounded-lg text-xs font-semibold shadow-xs transition flex items-center space-x-1.5"
             >
               <MapIcon className="w-3.5 h-3.5" />
-              <span>Launch Map</span>
+              <span>Open Map</span>
             </button>
           </div>
         </div>
       </div>
 
-      {/* Mobile Navigation Bar */}
-      <div className="md:hidden flex overflow-x-auto px-2 py-1.5 bg-slate-950 border-t border-slate-800/80 space-x-1">
+      {/* Mobile Navigation Scrollbar */}
+      <div className="md:hidden flex overflow-x-auto px-2 py-1.5 bg-slate-50 border-t border-slate-200 space-x-1">
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive = activeTab === item.id;
@@ -100,7 +100,7 @@ export default function Navbar({ activeTab, setActiveTab, alertCount = 2 }) {
               key={item.id}
               onClick={() => setActiveTab(item.id)}
               className={`flex-shrink-0 flex items-center space-x-1 px-2.5 py-1.5 rounded text-[11px] font-medium ${
-                isActive ? 'bg-cyan-900/60 text-cyan-300 border border-cyan-700/50' : 'text-slate-400'
+                isActive ? 'bg-blue-100 text-blue-800 font-semibold' : 'text-slate-600'
               }`}
             >
               <Icon className="w-3.5 h-3.5" />

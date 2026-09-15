@@ -1,17 +1,15 @@
 import React from 'react';
 import { 
-  AlertTriangle, 
-  ShieldCheck, 
   Users, 
   Home, 
   Hospital, 
-  Compass, 
+  MapPin, 
   ArrowRight, 
   Sliders, 
   CheckCircle2, 
   HelpCircle,
   Clock,
-  Sparkles
+  Compass
 } from 'lucide-react';
 import { calculatePrototypeRisk } from '../../services/riskCalculator';
 
@@ -23,11 +21,11 @@ export default function RiskDetailPanel({
 }) {
   if (!habitation) {
     return (
-      <div className="h-full flex flex-col items-center justify-center p-6 text-center text-slate-400 bg-slate-900/90 border-l border-slate-800">
-        <Compass className="w-12 h-12 text-slate-600 mb-3 animate-pulse" />
-        <h3 className="text-slate-200 font-semibold text-sm mb-1">No Habitation Selected</h3>
-        <p className="text-xs max-w-xs text-slate-400">
-          Click on any priority marker on the map or choose from the Priority Queue to assess vulnerability factors.
+      <div className="h-full flex flex-col items-center justify-center p-6 text-center text-slate-500 bg-white">
+        <Compass className="w-10 h-10 text-slate-300 mb-2" />
+        <h3 className="text-slate-700 font-semibold text-sm">No Location Selected</h3>
+        <p className="text-xs text-slate-500 max-w-xs mt-1">
+          Click any village marker on the map to view risk details and find safer relocation sites.
         </p>
       </div>
     );
@@ -36,158 +34,142 @@ export default function RiskDetailPanel({
   const assessment = calculatePrototypeRisk(habitation);
 
   const getScoreColor = (score) => {
-    if (score >= 70) return 'text-rose-400';
-    if (score >= 50) return 'text-amber-400';
-    return 'text-emerald-400';
+    if (score >= 70) return 'text-red-700';
+    if (score >= 50) return 'text-amber-700';
+    return 'text-green-700';
   };
 
-  const getProgressBarColor = (score) => {
-    if (score >= 70) return 'bg-rose-500';
+  const getBarColor = (score) => {
+    if (score >= 70) return 'bg-red-600';
     if (score >= 50) return 'bg-amber-500';
-    return 'bg-emerald-500';
+    return 'bg-green-600';
   };
 
   return (
-    <div className="h-full flex flex-col bg-slate-900/95 border-l border-slate-800 overflow-y-auto text-slate-200">
-      {/* Panel Top Header */}
-      <div className="p-4 border-b border-slate-800/80 bg-slate-950/40 flex items-start justify-between sticky top-0 z-10 backdrop-blur-md">
-        <div>
-          <div className="flex items-center space-x-2">
-            <span className="text-xs font-bold text-cyan-400 uppercase tracking-wider">
-              {habitation.district}, Kerala
-            </span>
-            <span className="text-slate-600">•</span>
-            <span className="text-xs text-slate-400">{habitation.taluk} Taluk</span>
+    <div className="h-full flex flex-col bg-white overflow-y-auto text-slate-800 text-xs">
+      {/* Top Header */}
+      <div className="p-4 border-b border-slate-200 bg-slate-50/50 sticky top-0 z-10">
+        <div className="flex items-start justify-between">
+          <div>
+            <div className="text-[11px] text-slate-500 font-medium">
+              {habitation.district} District, {habitation.state} • {habitation.taluk} Taluk
+            </div>
+            <h2 className="text-xl font-bold text-slate-900 mt-0.5">
+              {habitation.name}
+            </h2>
           </div>
-          <h2 className="text-xl font-extrabold text-white tracking-tight mt-0.5">
-            {habitation.name}
-          </h2>
-        </div>
-        <div className="text-right">
           <span className={`inline-flex items-center px-2.5 py-0.5 rounded text-xs font-bold border ${assessment.badgeColor}`}>
-            {assessment.classification.toUpperCase()} RISK
+            {assessment.classification} Risk
           </span>
-          <div className="text-[10px] text-slate-400 mt-1 flex items-center justify-end space-x-1">
-            <Clock className="w-3 h-3 text-slate-400" />
-            <span>{assessment.confidence}% Confidence</span>
-          </div>
         </div>
       </div>
 
-      {/* Main Score & Primary Call to Action */}
-      <div className="p-4 bg-gradient-to-b from-slate-900 via-slate-900 to-slate-950 border-b border-slate-800 space-y-4">
-        {/* Risk Score Gauge Display */}
-        <div className="flex items-center justify-between bg-slate-950/80 rounded-xl p-3.5 border border-slate-800 shadow-inner">
+      {/* Main Score & Primary Call-to-Actions */}
+      <div className="p-4 border-b border-slate-200 space-y-3.5">
+        {/* Risk Score Summary Card */}
+        <div className="flex items-center justify-between bg-slate-50 rounded-xl p-3.5 border border-slate-200">
           <div>
-            <div className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
+            <div className="text-[11px] text-slate-500 font-medium">
               Overall Risk Score
             </div>
-            <div className="flex items-baseline space-x-2 mt-0.5">
-              <span className={`text-4xl font-black tracking-tight ${getScoreColor(assessment.riskScore)}`}>
+            <div className="flex items-baseline space-x-1.5 mt-0.5">
+              <span className={`text-3xl font-extrabold ${getScoreColor(assessment.riskScore)}`}>
                 {assessment.riskScore}
               </span>
-              <span className="text-slate-500 font-bold text-base">/ 100</span>
-            </div>
-            <div className="text-[10px] text-slate-400 mt-0.5">
-              {assessment.methodology}
+              <span className="text-slate-400 font-medium text-sm">/ 100</span>
             </div>
           </div>
 
-          <div className="text-right space-y-1">
-            <div className="text-[11px] text-slate-400">Primary Signal</div>
-            <div className="text-xs font-bold text-rose-300 bg-rose-950/60 px-2 py-1 rounded border border-rose-900/50">
+          <div className="text-right">
+            <div className="text-[11px] text-slate-500">Main concern</div>
+            <div className="text-xs font-bold text-slate-800 bg-white px-2 py-1 rounded border border-slate-200 mt-0.5">
               {habitation.primaryHazard}
             </div>
           </div>
         </div>
 
-        {/* PRIMARY DIFFERENTIATOR ACTION: FIND SAFE SITES */}
+        {/* Primary Action Button: Find Safer Locations */}
         <div className="space-y-2">
           <button
             onClick={() => onFindSafeSites(habitation)}
-            className="w-full bg-gradient-to-r from-cyan-600 via-cyan-500 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-slate-950 font-extrabold py-3 px-4 rounded-xl shadow-lg shadow-cyan-900/40 border border-cyan-300/40 flex items-center justify-center space-x-2 transition transform active:scale-[0.99]"
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-4 rounded-lg shadow-xs flex items-center justify-center space-x-2 transition"
           >
-            <ShieldCheck className="w-5 h-5 text-slate-950" />
-            <span className="text-sm tracking-wide">FIND SAFE RELOCATION SITES</span>
-            <ArrowRight className="w-4 h-4 text-slate-950" />
+            <span>Find Safer Locations</span>
+            <ArrowRight className="w-4 h-4" />
           </button>
           
           <button
             onClick={() => onOpenSimulation(habitation)}
-            className="w-full bg-slate-800/80 hover:bg-slate-800 text-cyan-300 hover:text-white py-2 px-3 rounded-lg border border-slate-700/80 text-xs font-semibold flex items-center justify-center space-x-1.5 transition"
+            className="w-full bg-slate-50 hover:bg-slate-100 text-slate-700 py-2 px-3 rounded-lg border border-slate-200 font-medium flex items-center justify-center space-x-1.5 transition"
           >
-            <Sliders className="w-3.5 h-3.5 text-cyan-400" />
-            <span>Simulate Worsening Weather Scenarios</span>
+            <Sliders className="w-3.5 h-3.5 text-blue-600" />
+            <span>Scenario Planning: Weather Impact</span>
           </button>
         </div>
       </div>
 
-      {/* Demographics & Exposure Card */}
-      <div className="p-4 border-b border-slate-800/80 grid grid-cols-2 gap-2.5">
-        <div className="bg-slate-950/60 p-2.5 rounded-lg border border-slate-800/80">
-          <div className="flex items-center space-x-1.5 text-slate-400 text-xs mb-1">
-            <Users className="w-3.5 h-3.5 text-cyan-400" />
+      {/* Demographics & People at Risk */}
+      <div className="p-4 border-b border-slate-200 grid grid-cols-2 gap-2.5">
+        <div className="bg-slate-50 p-2.5 rounded-lg border border-slate-200">
+          <div className="flex items-center space-x-1.5 text-slate-500 text-xs mb-0.5">
+            <Users className="w-3.5 h-3.5 text-blue-600" />
             <span>People at Risk</span>
           </div>
-          <div className="text-lg font-extrabold text-white">
+          <div className="text-base font-bold text-slate-900">
             {habitation.population.toLocaleString()}
           </div>
-          <div className="text-[10px] text-slate-400">Total resident exposure</div>
+          <div className="text-[10px] text-slate-500">Residents exposed</div>
         </div>
 
-        <div className="bg-slate-950/60 p-2.5 rounded-lg border border-slate-800/80">
-          <div className="flex items-center space-x-1.5 text-slate-400 text-xs mb-1">
-            <Home className="w-3.5 h-3.5 text-amber-400" />
+        <div className="bg-slate-50 p-2.5 rounded-lg border border-slate-200">
+          <div className="flex items-center space-x-1.5 text-slate-500 text-xs mb-0.5">
+            <Home className="w-3.5 h-3.5 text-amber-600" />
             <span>Households</span>
           </div>
-          <div className="text-lg font-extrabold text-white">
+          <div className="text-base font-bold text-slate-900">
             {habitation.households}
           </div>
-          <div className="text-[10px] text-slate-400">{habitation.vulnerabilityFactors?.kutchaHousesPercent}% semi-permanent</div>
+          <div className="text-[10px] text-slate-500">{habitation.vulnerabilityFactors?.kutchaHousesPercent}% semi-permanent</div>
         </div>
       </div>
 
       {/* "Why is this area at risk?" Plain Language Breakdown */}
-      <div className="p-4 border-b border-slate-800/80 space-y-3">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-1.5 font-bold text-xs uppercase tracking-wider text-slate-200">
-            <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
-            <span>Why is this area at risk?</span>
-          </div>
-          <span className="text-[10px] text-slate-400">Plain Language Analysis</span>
+      <div className="p-4 border-b border-slate-200 space-y-3">
+        <div className="font-bold text-slate-900 text-xs">
+          Why is this area at risk?
         </div>
 
         <div className="space-y-2.5">
           {assessment.contributingFactors.map((factor, idx) => (
-            <div key={idx} className="bg-slate-950/50 p-2.5 rounded-lg border border-slate-800/80">
-              <div className="flex items-center justify-between mb-1 text-xs">
-                <span className="font-semibold text-slate-200">{factor.label}</span>
+            <div key={idx} className="bg-slate-50 p-2.5 rounded-lg border border-slate-200">
+              <div className="flex items-center justify-between mb-1">
+                <span className="font-semibold text-slate-800">{factor.label}</span>
                 <span className={`font-bold ${getScoreColor(factor.score)}`}>
                   {factor.score}/100 • {factor.level}
                 </span>
               </div>
-              <div className="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden mb-1.5">
+              <div className="w-full bg-slate-200 h-1.5 rounded-full overflow-hidden mb-1.5">
                 <div 
-                  className={`h-full ${getProgressBarColor(factor.score)}`} 
+                  className={`h-full ${getBarColor(factor.score)}`} 
                   style={{ width: `${Math.min(100, factor.score)}%` }}
                 ></div>
               </div>
-              <p className="text-[11px] text-slate-300 leading-relaxed">
+              <p className="text-[11px] text-slate-600 leading-normal">
                 {factor.plainLanguage}
               </p>
             </div>
           ))}
         </div>
 
-        {/* Bullet Explanations */}
-        <div className="bg-slate-950/40 p-3 rounded-lg border border-slate-800/60 mt-3">
-          <div className="text-[11px] font-semibold text-slate-300 uppercase tracking-wider mb-2">
-            Field Ground Realities
+        {/* Local Ground Observations */}
+        <div className="bg-slate-50 p-3 rounded-lg border border-slate-200 mt-2">
+          <div className="font-semibold text-slate-700 mb-1.5 text-[11px]">
+            Key Field Observations
           </div>
-          <ul className="space-y-1.5">
+          <ul className="space-y-1 text-[11px] text-slate-600">
             {habitation.whyAtRisk?.map((reason, i) => (
-              <li key={i} className="flex items-start space-x-2 text-[11px] text-slate-300 leading-normal">
-                <span className="text-rose-400 font-bold mt-0.5">•</span>
+              <li key={i} className="flex items-start space-x-1.5">
+                <span className="text-blue-600 font-bold">•</span>
                 <span>{reason}</span>
               </li>
             ))}
@@ -195,31 +177,31 @@ export default function RiskDetailPanel({
         </div>
       </div>
 
-      {/* Emergency Response Infrastructure */}
-      <div className="p-4 border-b border-slate-800/80 space-y-2">
-        <div className="text-xs font-bold uppercase tracking-wider text-slate-200 flex items-center space-x-1.5">
-          <Hospital className="w-3.5 h-3.5 text-blue-400" />
-          <span>Nearest Health Infrastructure</span>
+      {/* Nearby Healthcare */}
+      <div className="p-4 border-b border-slate-200 space-y-2">
+        <div className="font-bold text-slate-900 text-xs flex items-center space-x-1.5">
+          <Hospital className="w-3.5 h-3.5 text-blue-600" />
+          <span>Nearest Healthcare</span>
         </div>
-        <div className="bg-slate-950/50 p-3 rounded-lg border border-slate-800/80 flex items-center justify-between">
+        <div className="bg-slate-50 p-2.5 rounded-lg border border-slate-200 flex items-center justify-between">
           <div>
-            <div className="text-xs font-bold text-white">{habitation.nearestHealthcare?.name}</div>
-            <div className="text-[10px] text-slate-400">{habitation.nearestHealthcare?.type} • {habitation.nearestHealthcare?.emergencyBeds} Beds</div>
+            <div className="font-semibold text-slate-800">{habitation.nearestHealthcare?.name}</div>
+            <div className="text-[10px] text-slate-500">{habitation.nearestHealthcare?.type} • {habitation.nearestHealthcare?.emergencyBeds} Beds</div>
           </div>
           <div className="text-right">
-            <span className="text-xs font-extrabold text-cyan-400">{habitation.nearestHealthcare?.distanceKm} km</span>
-            <div className="text-[9px] text-slate-500">Transit Distance</div>
+            <span className="font-bold text-blue-700">{habitation.nearestHealthcare?.distanceKm} km</span>
+            <div className="text-[9px] text-slate-400">Distance</div>
           </div>
         </div>
       </div>
 
-      {/* Recommended Action Advisory */}
-      <div className="p-4 bg-emerald-950/20 border-t border-emerald-900/30">
-        <div className="flex items-center space-x-2 text-emerald-400 text-xs font-bold mb-1">
-          <CheckCircle2 className="w-4 h-4" />
+      {/* Field Action Recommendation */}
+      <div className="p-4 bg-blue-50/50">
+        <div className="flex items-center space-x-1.5 text-blue-800 font-bold text-xs mb-1">
+          <CheckCircle2 className="w-3.5 h-3.5 text-blue-600" />
           <span>Recommended Next Action</span>
         </div>
-        <p className="text-xs text-emerald-200/90 leading-relaxed">
+        <p className="text-slate-700 leading-normal">
           {habitation.fieldAction}
         </p>
       </div>

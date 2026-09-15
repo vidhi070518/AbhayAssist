@@ -7,23 +7,26 @@ export default {
   theme: {
     extend: {
       colors: {
-        disaster: {
-          dark: '#0a0f1d',
-          surface: '#111827',
-          card: '#1e293b',
-          border: '#334155',
-          text: '#f8fafc',
-          muted: '#94a3b8',
-          high: '#ef4444',
-          highBg: 'rgba(239, 68, 68, 0.15)',
-          moderate: '#f59e0b',
-          moderateBg: 'rgba(245, 158, 11, 0.15)',
-          low: '#10b981',
-          lowBg: 'rgba(16, 185, 129, 0.15)',
-          safe: '#06b6d4',
-          safeBg: 'rgba(6, 182, 212, 0.15)',
-          sachet: '#ea580c',
-          sachetBg: 'rgba(234, 88, 12, 0.15)',
+        gov: {
+          50: '#f0f6ff',
+          100: '#e0edfe',
+          200: '#bae0fd',
+          500: '#2563eb',
+          600: '#1d4ed8',
+          700: '#1e40af',
+          800: '#1e3a8a',
+          900: '#172554',
+        },
+        risk: {
+          high: '#dc2626',
+          highLight: '#fef2f2',
+          highBorder: '#fecaca',
+          moderate: '#d97706',
+          moderateLight: '#fffbeb',
+          moderateBorder: '#fde68a',
+          low: '#16a34a',
+          lowLight: '#f0fdf4',
+          lowBorder: '#bbf7d0',
         }
       },
       fontFamily: {

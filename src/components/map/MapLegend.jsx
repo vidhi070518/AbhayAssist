@@ -5,87 +5,87 @@ export default function MapLegend() {
   const [isExpanded, setIsExpanded] = useState(true);
 
   return (
-    <div className="absolute bottom-6 left-6 z-[1000] bg-slate-900/95 border border-slate-700/80 rounded-lg shadow-2xl backdrop-blur-md text-xs text-slate-200 p-3 max-w-[260px]">
+    <div className="absolute bottom-6 left-6 z-[1000] bg-white/95 border border-slate-200 rounded-lg shadow-md text-xs text-slate-700 p-3 max-w-[240px]">
       <div 
-        className="flex items-center justify-between cursor-pointer pb-1.5 border-b border-slate-800"
+        className="flex items-center justify-between cursor-pointer pb-1.5 border-b border-slate-100"
         onClick={() => setIsExpanded(!isExpanded)}
       >
-        <div className="flex items-center space-x-1.5 font-bold tracking-wide text-slate-100">
-          <Layers className="w-3.5 h-3.5 text-cyan-400" />
+        <div className="flex items-center space-x-1.5 font-bold text-slate-800 text-[11px] tracking-wide">
+          <Layers className="w-3.5 h-3.5 text-blue-600" />
           <span>MAP LEGEND</span>
         </div>
-        <button className="text-slate-400 hover:text-white">
+        <button className="text-slate-400 hover:text-slate-600">
           {isExpanded ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronUp className="w-3.5 h-3.5" />}
         </button>
       </div>
 
       {isExpanded && (
-        <div className="mt-2.5 space-y-3">
+        <div className="mt-2 space-y-2.5 text-[11px]">
           {/* Risk Levels */}
           <div>
-            <div className="text-[10px] font-semibold uppercase text-slate-400 mb-1.5 tracking-wider">
-              Habitation Risk Level
+            <div className="text-[10px] font-bold uppercase text-slate-400 mb-1">
+              Risk Level
             </div>
             <div className="space-y-1">
               <div className="flex items-center space-x-2">
-                <span className="w-3 h-3 rounded-full bg-rose-500 border border-white shadow-sm"></span>
-                <span className="font-medium text-slate-200">High Risk (Score ≥ 70)</span>
+                <span className="w-2.5 h-2.5 rounded-full bg-red-600"></span>
+                <span>High Risk (Score ≥ 70)</span>
               </div>
               <div className="flex items-center space-x-2">
-                <span className="w-3 h-3 rounded-full bg-amber-500 border border-white shadow-sm"></span>
-                <span className="font-medium text-slate-200">Moderate Risk (50–69)</span>
+                <span className="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
+                <span>Moderate Risk (50–69)</span>
               </div>
               <div className="flex items-center space-x-2">
-                <span className="w-3 h-3 rounded-full bg-emerald-500 border border-white shadow-sm"></span>
-                <span className="font-medium text-slate-200">Low Risk (&lt; 50)</span>
+                <span className="w-2.5 h-2.5 rounded-full bg-green-600"></span>
+                <span>Lower Risk (&lt; 50)</span>
               </div>
             </div>
           </div>
 
-          {/* Key Entities */}
+          {/* Map Entities */}
           <div>
-            <div className="text-[10px] font-semibold uppercase text-slate-400 mb-1.5 tracking-wider">
-              Strategic Assets
+            <div className="text-[10px] font-bold uppercase text-slate-400 mb-1">
+              Locations & Facilities
             </div>
             <div className="space-y-1">
               <div className="flex items-center space-x-2">
-                <span className="w-3 h-3 rounded-sm bg-cyan-400 border border-white shadow-sm flex items-center justify-center text-[9px] font-bold text-slate-950">
+                <span className="w-2.5 h-2.5 rounded-sm bg-blue-600 flex items-center justify-center text-[8px] text-white font-bold">
                   S
                 </span>
-                <span>Candidate Safe Relocation Site</span>
+                <span>Safe Relocation Site</span>
               </div>
               <div className="flex items-center space-x-2">
-                <span className="w-3 h-3 rounded-full bg-blue-600 border border-white text-white flex items-center justify-center text-[8px] font-bold">
+                <span className="w-2.5 h-2.5 rounded-full bg-sky-600 text-white flex items-center justify-center text-[7px] font-bold">
                   +
                 </span>
-                <span>Hospital / Health Centre</span>
+                <span>Healthcare Facility</span>
               </div>
               <div className="flex items-center space-x-2">
-                <span className="w-3 h-3 rounded-sm bg-purple-600 border border-white text-white flex items-center justify-center text-[8px] font-bold">
+                <span className="w-2.5 h-2.5 rounded-sm bg-purple-600 text-white flex items-center justify-center text-[7px] font-bold">
                   ▲
                 </span>
-                <span>Designated Cyclone Shelter</span>
+                <span>Cyclone Shelter</span>
               </div>
             </div>
           </div>
 
-          {/* Prototype Hazard Overlays */}
+          {/* Hazard Zones */}
           <div>
-            <div className="text-[10px] font-semibold uppercase text-slate-400 mb-1.5 tracking-wider">
-              Prototype Hazard Polygons
+            <div className="text-[10px] font-bold uppercase text-slate-400 mb-1">
+              Hazard Zones
             </div>
             <div className="space-y-1">
               <div className="flex items-center space-x-2">
-                <span className="w-3 h-2 rounded bg-rose-500/40 border border-rose-500"></span>
-                <span>Coastal Erosion Corridor</span>
+                <span className="w-3 h-2 rounded bg-red-100 border border-red-500"></span>
+                <span>Coastal Erosion Zone</span>
               </div>
               <div className="flex items-center space-x-2">
-                <span className="w-3 h-2 rounded bg-blue-500/40 border border-blue-500"></span>
+                <span className="w-3 h-2 rounded bg-blue-100 border border-blue-500"></span>
                 <span>River Flood Basin</span>
               </div>
               <div className="flex items-center space-x-2">
-                <span className="w-3 h-2 rounded bg-amber-500/40 border border-amber-500"></span>
-                <span>Landslide Slope Zone</span>
+                <span className="w-3 h-2 rounded bg-amber-100 border border-amber-500"></span>
+                <span>Landslide Slope Area</span>
               </div>
             </div>
           </div>
