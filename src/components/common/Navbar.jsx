@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { 
   ShieldCheck, 
   Map as MapIcon, 
@@ -73,10 +73,10 @@ export default function Navbar({ activeTab, setActiveTab, alertCount = 2 }) {
           </nav>
 
           {/* Right Action & Operational Status */}
-          <div className="flex items-center space-x-3">
-            <div className="hidden lg:flex items-center space-x-2 bg-slate-50 border border-slate-200 px-2.5 py-1.5 rounded-lg text-[11px] text-slate-600">
+          <div className="flex items-center space-x-2 sm:space-x-3">
+            <div className="hidden xl:flex items-center space-x-2 bg-slate-50 border border-slate-200 px-2.5 py-1.5 rounded-lg text-[11px] text-slate-600">
               <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
-              <span>Operations Centre Active</span>
+              <span>Operations Active</span>
             </div>
 
             <button

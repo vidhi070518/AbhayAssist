@@ -88,6 +88,89 @@ export default function OverviewView({
         </div>
       </div>
 
+      {/* 4-Step Operational Decision Pipeline */}
+      <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-xs">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-100">
+          <div>
+            <h2 className="text-xs font-bold text-slate-900 uppercase tracking-wider">
+              Operational Decision Pipeline
+            </h2>
+            <p className="text-[11px] text-slate-500 mt-0.5">
+              End-to-end workflow from early telemetry detection to proactive site relocation.
+            </p>
+          </div>
+          <span className="text-[11px] font-semibold text-blue-700 bg-blue-50 border border-blue-200 px-2.5 py-1 rounded-md self-start sm:self-auto">
+            Proactive Relocation Architecture
+          </span>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 pt-4">
+          <div 
+            onClick={onOpenMap}
+            className="p-3.5 rounded-lg border border-slate-200 hover:border-blue-400 bg-slate-50/50 hover:bg-blue-50/30 transition cursor-pointer group"
+          >
+            <div className="flex items-center justify-between mb-2">
+              <span className="w-6 h-6 rounded-md bg-blue-100 text-blue-800 font-bold text-xs flex items-center justify-center">1</span>
+              <Radio className="w-4 h-4 text-blue-600 group-hover:scale-110 transition" />
+            </div>
+            <div className="text-xs font-bold text-slate-900">1. Hazard Telemetry</div>
+            <p className="text-[11px] text-slate-600 mt-1 leading-snug">
+              Satellite GIS overlays (Bhuvan) and weather alerts (IMD SACHET) detect hazard zones before peak intensity.
+            </p>
+          </div>
+
+          <div 
+            onClick={() => onOpenMap()}
+            className="p-3.5 rounded-lg border border-slate-200 hover:border-blue-400 bg-slate-50/50 hover:bg-blue-50/30 transition cursor-pointer group"
+          >
+            <div className="flex items-center justify-between mb-2">
+              <span className="w-6 h-6 rounded-md bg-amber-100 text-amber-800 font-bold text-xs flex items-center justify-center">2</span>
+              <AlertTriangle className="w-4 h-4 text-amber-600 group-hover:scale-110 transition" />
+            </div>
+            <div className="text-xs font-bold text-slate-900">2. Vulnerability Triage</div>
+            <p className="text-[11px] text-slate-600 mt-1 leading-snug">
+              Automated 0–100 risk scoring evaluating population density, semi-permanent housing, and cut-off risk.
+            </p>
+          </div>
+
+          <div 
+            onClick={() => {
+              const mogral = habitations.find(h => h.id === 'hab-mogral-puthur') || habitations[0];
+              if (mogral) onSelectHabitation(mogral);
+              onOpenRelocation();
+            }}
+            className="p-3.5 rounded-lg border border-slate-200 hover:border-blue-400 bg-slate-50/50 hover:bg-blue-50/30 transition cursor-pointer group"
+          >
+            <div className="flex items-center justify-between mb-2">
+              <span className="w-6 h-6 rounded-md bg-emerald-100 text-emerald-800 font-bold text-xs flex items-center justify-center">3</span>
+              <Building className="w-4 h-4 text-emerald-600 group-hover:scale-110 transition" />
+            </div>
+            <div className="text-xs font-bold text-slate-900">3. Safe Site Matching</div>
+            <p className="text-[11px] text-slate-600 mt-1 leading-snug">
+              Algorithm matches habitations to elevated, verified public campuses with high capacity outside flood zones.
+            </p>
+          </div>
+
+          <div 
+            onClick={() => {
+              const mogral = habitations.find(h => h.id === 'hab-mogral-puthur') || habitations[0];
+              if (mogral) onSelectHabitation(mogral);
+              onOpenRelocation();
+            }}
+            className="p-3.5 rounded-lg border border-slate-200 hover:border-blue-400 bg-slate-50/50 hover:bg-blue-50/30 transition cursor-pointer group"
+          >
+            <div className="flex items-center justify-between mb-2">
+              <span className="w-6 h-6 rounded-md bg-indigo-100 text-indigo-800 font-bold text-xs flex items-center justify-center">4</span>
+              <Navigation className="w-4 h-4 text-indigo-600 group-hover:scale-110 transition" />
+            </div>
+            <div className="text-xs font-bold text-slate-900">4. Evacuation Logistics</div>
+            <p className="text-[11px] text-slate-600 mt-1 leading-snug">
+              Calculates direct road corridors, required KSRTC bus fleets, and generates 1-click executive action briefs.
+            </p>
+          </div>
+        </div>
+      </div>
+
       {/* 4 Clear Summary Metrics */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-xs">

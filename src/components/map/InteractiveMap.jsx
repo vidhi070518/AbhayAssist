@@ -33,9 +33,12 @@ function MapSizeInvalidator() {
   const map = useMap();
   useEffect(() => {
     map.invalidateSize();
-    const timer = setTimeout(() => {
-      map.invalidateSize();
-    }, 250);
+    const timers = [
+      setTimeout(() => map.invalidateSize(), 50),
+      setTimeout(() => map.invalidateSize(), 200),
+      setTimeout(() => map.invalidateSize(), 500),
+      setTimeout(() => map.invalidateSize(), 1000)
+    ];
     const resizeObserver = new ResizeObserver(() => {
       map.invalidateSize();
     });
@@ -44,7 +47,7 @@ function MapSizeInvalidator() {
       resizeObserver.observe(container);
     }
     return () => {
-      clearTimeout(timer);
+      timers.forEach(clearTimeout);
       resizeObserver.disconnect();
     };
   }, [map]);
@@ -82,6 +85,28 @@ export default function InteractiveMap({
   const [mapZoom, setMapZoom] = useState(DEFAULT_ZOOM);
   const [searchQuery, setSearchQuery] = useState('');
   const [isLayerControlOpen, setIsLayerControlOpen] = useState(false);
+  const [basemapStyle, setBasemapStyle] = useState('osm'); // 'osm' | 'cartoVoyager' | 'cartoLight'
+
+  const basemapTiles = {
+    osm: {
+      name: 'OpenStreetMap Standard',
+      url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+      maxZoom: 19
+    },
+    cartoVoyager: {
+      name: 'Carto Voyager (Fast)',
+      url: 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+      maxZoom: 20
+    },
+    cartoLight: {
+      name: 'Carto Light (Clean)',
+      url: 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+      maxZoom: 20
+    }
+  };
 
   // Filters
   const [hazardFilter, setHazardFilter] = useState('all'); // 'all' | 'coastal' | 'flood' | 'landslide'
@@ -390,6 +415,18 @@ export default function InteractiveMap({
             <option value="low">Lower Risk (&lt;50)</option>
           </select>
 
+          {/* Basemap Style Selector */}
+          <select
+            value={basemapStyle}
+            onChange={(e) => setBasemapStyle(e.target.value)}
+            className="bg-white text-xs text-slate-700 border border-slate-300 rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-blue-600 shadow-xs font-medium"
+            title="Switch Map Tiles Provider"
+          >
+            <option value="osm">Basemap: OpenStreetMap</option>
+            <option value="cartoVoyager">Basemap: Carto Voyager (Fast)</option>
+            <option value="cartoLight">Basemap: Carto Light (Clean)</option>
+          </select>
+
           {/* Reset View Button */}
           <button
             onClick={handleResetView}
@@ -497,17 +534,18 @@ export default function InteractiveMap({
         center={KASARAGOD_CENTER}
         zoom={DEFAULT_ZOOM}
         scrollWheelZoom={true}
-        className="w-full h-full"
-        style={{ width: '100%', height: '100%' }}
+        className="w-full h-full flex-1"
+        style={{ width: '100%', height: '100%', minHeight: '500px', position: 'relative' }}
       >
         <MapSizeInvalidator />
         <MapFlyController targetCoords={mapCenter} zoomLevel={mapZoom} />
 
-        {/* Real OpenStreetMap Basemap Tiles */}
+        {/* Real Geographic Basemap Tiles */}
         <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          maxZoom={19}
+          key={basemapStyle}
+          attribution={basemapTiles[basemapStyle]?.attribution || basemapTiles.osm.attribution}
+          url={basemapTiles[basemapStyle]?.url || basemapTiles.osm.url}
+          maxZoom={basemapTiles[basemapStyle]?.maxZoom || 19}
         />
 
         {/* Transparent GeoJSON Hazard Overlays */}
